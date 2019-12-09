@@ -8,14 +8,18 @@ import router from './router'
 import axios from 'axios'
 import store from './store/store'
 import uploader from 'vue-simple-uploader'
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 
-process.env.Mock && require('./mock.js')
+// process.env.Mock && require('./mock.js')
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 
 Vue.use(ElementUI)
 Vue.use(uploader)
+Vue.use(mavonEditor)
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

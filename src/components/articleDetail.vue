@@ -3,8 +3,8 @@
       <el-header class="header" height="120px">
         <div class="logo"></div>
         <el-breadcrumb separator="/" class="nav">
-          <el-breadcrumb-item :to="{ path: '/' }">最热</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">最新</a></el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/' }">Hotest</el-breadcrumb-item>
+          <el-breadcrumb-item><a href="/">Latest</a></el-breadcrumb-item>
           <el-breadcrumb-item><a href="/">节点</a></el-breadcrumb-item>
           <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
         </el-breadcrumb>
@@ -13,14 +13,15 @@
           <el-card shadow="always" class="post">
             <div slot="header" class="clearfix">
                 <div class="container">
-                    <img class="avatar fr" v-bind:src="postContent.member.avatar_mini" alt="avatar">
+                    <!-- <img class="avatar fr" v-bind:src="postContent.member.avatar_mini" alt="avatar"> -->
                     <el-button size="mini" round> #{{ postContent.node.title }}</el-button>
                     <h1 class="post-title">{{ postContent.title }}</h1>
                     <small class="post-author">{{postContent.member.username}}   ● 最后回复 ● {{postContent.last_reply_by}}</small>
                 </div>
             </div>
             <div class="content clearfix">
-                <div class="post-content" v-html="postContent.content_rendered"></div>
+                <!-- <div class="post-content" v-html="postContent.content_rendered"></div> -->
+                <markdown-it-vue class="md-body" :content="content" :options="options" />
             </div>
           </el-card>
           <ul>
@@ -34,17 +35,32 @@
     </el-container>
 </template>
 <script>
+import MarkdownItVue from 'markdown-it-vue'
+import 'markdown-it-vue/dist/markdown-it-vue.css'
 import Replies from '@/components/Replies'
 export default {
   name: 'postDetail',
   components: {
-    'replie': Replies
+    'replie': Replies,
+    MarkdownItVue
   },
   data () {
     return {
       postContent: {},
       postReplies: [],
-      loading: true
+      loading: true,
+      content: '# markdown-it-vue\n## GitHub Table of Contents',
+      options: {
+        markdownIt: {
+          linkify: true
+        },
+        linkAttributes: {
+          attrs: {
+            target: '_blank',
+            rel: 'noopener'
+          }
+        }
+      }
     }
   },
   created: function () {

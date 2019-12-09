@@ -3,16 +3,16 @@
     <el-container>
       <el-header>
         <el-row>
-          <el-col offset="1" span="4">
+          <el-col :offset="1" :span="4">
             <div><img src="../assets/185-43-hor.png" alt="Mlab"/></div>
           </el-col>
-          <el-col span="2" offset="11">
+          <el-col :span="2" :offset="11">
             <div style="margin-top: 15px"><el-link href="/society">社区</el-link></div>
           </el-col>
-          <el-col span="2">
+          <el-col :span="2">
             <div style="margin-top: 15px"><el-link href="/canvas">主页</el-link></div>
           </el-col>
-          <el-col span="2">
+          <el-col :span="2">
             <div style="margin-top: 15px">
               <el-dropdown>
                 <span class="el-dropdown-link">
@@ -27,9 +27,9 @@
               </el-dropdown>
             </div>
           </el-col>
-          <el-col span="2">
-            <div class="block"><el-avatar :size="50" :src="circleUrl"></el-avatar></div>
-          </el-col>
+          <!-- <el-col :span="2">
+            <div class="block"><el-avatar :size="50" src="circleUrl"></el-avatar></div>
+          </el-col> -->
         </el-row>
       </el-header>
       <el-row>
@@ -38,7 +38,7 @@
       <el-divider content-position="left">My lab, machine lab.</el-divider>
       <el-footer>
         <el-row type="flex" justify="center">
-          <el-col span="4" style="vertical-align: middle">
+          <el-col :span="4" style="vertical-align: middle">
             <div style="color: rgba(0,0,0,0.6);">
               Made In China
             </div>
