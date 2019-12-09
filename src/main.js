@@ -9,7 +9,7 @@ import axios from 'axios'
 import store from './store/store'
 import uploader from 'vue-simple-uploader'
 
-process.env.Mock && require('./mock.js')
+// process.env.Mock && require('./mock.js')
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios

@@ -5,7 +5,6 @@
         <el-breadcrumb separator="/" class="nav">
           <el-breadcrumb-item :to="{ path: '/' }">最热</el-breadcrumb-item>
           <el-breadcrumb-item><a href="/">最新</a></el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">节点</a></el-breadcrumb-item>
           <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
         </el-breadcrumb>
       </el-header>
