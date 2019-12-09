@@ -6,9 +6,13 @@
           <el-col :offset=1 :span=4>
             <div><img src="../assets/185-43-hor.png" alt="Mlab"/></div>
           </el-col>
-          <el-col :span=2 :offset=8>
+          <el-col :span=4 :offset=8>
             <div style="margin-top: 15px">
-              <input type="text">
+              <el-input
+                placeholder="请输入内容"
+                prefix-icon="el-icon-search"
+                v-model="input2">
+             </el-input>
             </div>
           </el-col>
           <el-col :span=2 >
