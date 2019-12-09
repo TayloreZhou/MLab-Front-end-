@@ -3,15 +3,15 @@
       <el-divider content-position="right">My lab, machine lab.</el-divider>
       <el-header class="header" height="80px">
         <el-row>
-          <el-col span="5">
+          <el-col span=5>
             <el-breadcrumb separator="/" class="nav">
               <el-breadcrumb-item><a @click="getHotList">最热</a></el-breadcrumb-item>
               <el-breadcrumb-item><a @click="getLatestList">最新</a></el-breadcrumb-item>
-              <el-breadcrumb-item><a href="/nodes">节点</a></el-breadcrumb-item>
+              <!-- <el-breadcrumb-item><a href="/nodes">节点</a></el-breadcrumb-item> -->
               <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
             </el-breadcrumb>
           </el-col>
-          <el-col span="2" offset="17">
+          <el-col span=5 offset=17>
             <el-link href="/society/write">我要发帖</el-link>
           </el-col>
         </el-row>
