@@ -6,20 +6,20 @@
           <el-col :offset=1 :span=4>
             <div><img src="../assets/185-43-hor.png" alt="Mlab"/></div>
           </el-col>
-          <el-col :span=4 :offset=8>
-            <div style="margin-top: 15px">
+          <el-col  :span=4 :offset=8 >
+            <div style="margin-top: 10px">
               <el-input
-                placeholder="请输入内容"
+                placeholder="搜索帖子"
                 prefix-icon="el-icon-search"
-                v-model="input2">
+                v-model="searchInput">
              </el-input>
             </div>
           </el-col>
-          <el-col :span=2 >
-            <div style="margin-top: 15px"><el-link href="/society">社区</el-link></div>
-          </el-col>
-          <el-col :span=2>
+          <el-col :span=1 >
             <div style="margin-top: 15px"><el-link href="/canvas">主页</el-link></div>
+          </el-col>
+          <el-col :span=1 >
+            <div style="margin-top: 15px"><el-link href="/society">社区</el-link></div>
           </el-col>
           <el-col :span=2>
             <div style="margin-top: 15px">
@@ -64,6 +64,11 @@
 <script>
 export default {
   name: 'layout',
+  data () {
+    return {
+      searchInput: ''
+    }
+  },
   methods: {
     myInfo () {
       this.$router.push({path: '/canvas'})
