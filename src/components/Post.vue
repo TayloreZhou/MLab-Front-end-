@@ -4,24 +4,27 @@
     <div slot="header"
          class="clearfix">
       <div class="container">
-        <div class="ava">
-          <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-          <a class="post-title">{{ postData.title }}</a>
-          <a class="author">{{ postData.username }}</a>
-        </div>
-        <div class="post-preview">
-          <a class="post-detail">{{ postData.content }}</a>
+        <div class="post-prview">
+          <div>
+            <img class="avatar"
+                 src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                 alt="avatar">
+            <a class="author">{{ postData.username }}</a>
+          </div>
+          <!-- <el-button>回帖</el-button> -->
+          <div>
+            <a class="post-title"
+               @click="handlePostDetail">{{ postData.title }}</a>
+          </div>
+          <!-- <div class="post-detail">
+            <a>{{ postData.content }}</a>
+          </div> -->
         </div>
       </div>
     </div>
-    <div class="content clearfix">
-      <el-button class="node-name"
-                 round
-                 size="small"># {{ postData.node.title }}</el-button>
-      <el-button class="post-detail"
-                 style="float: right;"
-                 type="text"
-                 v-bind:href="postData.url">查看原帖</el-button>
+    <div class="description">
+      <a>{{ postData.likeNum }} like, {{ postData.commentNum }} comment </a>
+      <span style="float: right">{{postData.createTime}}</span>
     </div>
   </el-card>
 </template>
@@ -31,9 +34,11 @@ export default {
   name: 'post',
   props: ['postData'],
   data () {
-    return {}
+    return {
+    }
   },
-  mounted: function () { },
+  mounted: function () {
+  },
   methods: {
     handlePostDetail () {
       this.$router.push({ path: '/society/detail/' + this.postData.id })
@@ -54,20 +59,20 @@ a {
   margin-bottom: 8px;
 }
 .post-prview {
-  height: 50px;
+  height: 100px;
   position: relative;
 }
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: 24px;
+  height: 24px;
   float: left;
 }
 .post-title {
-  width: 80%;
-  padding-left: 10px;
+  width: 85%;
+  padding-top: 5%;
   color: #1a1a1a;
   text-align: left;
-  font-size: 16px;
+  font-size: 24px;
   line-height: 1.6;
   font-weight: 600;
   overflow: hidden;
@@ -78,22 +83,28 @@ a {
 }
 .author {
   padding-left: 10px;
-  color: gray;
+  color: #3293ee;
   float: left;
 }
 .replies-num {
   width: 50px;
   height: 30px;
   margin-right: 18px;
+  margin-top: 0px;
   float: right;
 }
 .post-detail {
-  padding-right: 20px;
-  float: right;
+  text-align: left;
+  float: left;
 }
 .node-name {
   margin-top: 4px;
   margin-left: 10px;
+}
+.description {
+  text-align: left;
+  color: gray;
+  padding: 5px;
 }
 </style>
 

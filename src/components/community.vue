@@ -69,7 +69,7 @@ export default {
     getHotList () {
       // 获取热门主题下的信息
       this.$axios
-        .get('/boot/post/get-order-by-like?page-num=2&&page-size=2')
+        .get('/boot/post/get-order-by-like?page-num=1&&page-size=10')
         .then(response => {
           console.log('hot list\n')
           console.log(response.data.list)
@@ -83,10 +83,10 @@ export default {
     getLatestList () {
       // 获取最新主题下的信息
       this.$axios
-        .get('/api/topics/latest.json')
+        .get('/boot/post/get-order-by-time?page-num=1&&page-size=10')
         .then(response => {
           console.log(response.data)
-          this.posts = response.data
+          this.posts = response.data.list
           this.loading = false
         })
         .catch(error => {
