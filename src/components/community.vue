@@ -1,37 +1,42 @@
 <template>
-    <el-container class="wrap">
-      <el-divider content-position="right">My lab, machine lab.</el-divider>
-      <el-header class="header" height="80px">
-        <el-row>
-          <el-col span=5>
-            <el-breadcrumb separator="/" class="nav">
+  <el-container class="wrap">
+    <el-divider content-position="right">My lab, machine lab.</el-divider>
+    <el-header class="header" height="80px">
+      <el-row>
+        <el-col span=5>
+          <el-button-group>
+            <el-button type="primary" @click="getLatestList">最新</el-button>
+            <el-button type="primary" @click="getHottList">最热</el-button>
+          </el-button-group>
+          <!-- <el-breadcrumb separator="/" class="nav">
               <el-breadcrumb-item><a @click="getHotList">最热</a></el-breadcrumb-item>
-              <el-breadcrumb-item><a @click="getLatestList">最新</a></el-breadcrumb-item>
-              <!-- <el-breadcrumb-item><a href="/nodes">节点</a></el-breadcrumb-item> -->
-              <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
-            </el-breadcrumb>
-          </el-col>
-          <el-col span=5 offset=17>
-            <el-link href="/society/write">我要发帖</el-link>
-          </el-col>
-        </el-row>
-      </el-header>
-      <el-main class="main" v-loading="loading">
-        <ul>
-          <post v-for=" postData in posts" :key="postData.id" :postData="postData"></post>
-        </ul>
-      </el-main>
-      <el-divider content-position="left">My lab, machine lab.</el-divider>
-    </el-container>
+          <el-breadcrumb-item><a @click="getLatestList">最新</a></el-breadcrumb-item>-->
+          <!-- <el-breadcrumb-item><a href="/nodes">节点</a></el-breadcrumb-item> -->
+          <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
+          <!-- </el-breadcrumb> -->
+        </el-col>
+        <el-col span=5 offset= 13 >
+          <el-button @click="gotoLink" type="primary">我要发贴</el-button>
+          <!-- <el-link href="/society/write">我要发帖</el-link> -->
+        </el-col>
+      </el-row>
+    </el-header>
+    <el-main class="main" v-loading="loading">
+      <ul>
+        <post v-for=" postData in posts" :key="postData.id" :postData="postData"></post>
+      </ul>
+    </el-main>
+    <el-divider content-position="left">My lab, machine lab.</el-divider>
+  </el-container>
 </template>
 
 <script>
-import Post from '@/components/Post'
+import Post from '@/components/Post.vue'
 
 export default {
   name: 'home',
   components: {
-    'post': Post
+    post: Post
   },
   data () {
     return {
@@ -46,26 +51,28 @@ export default {
   },
   methods: {
     getHotList () {
-    // 获取热门主题下的信息
-      this.$axios.get('/api/topics/hot.json')
-        .then((response) => {
+      // 获取热门主题下的信息
+      this.$axios
+        .get('/api/topics/hot.json')
+        .then(response => {
           console.log(response.data)
           this.posts = response.data
           this.loading = false
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error)
         })
     },
     getLatestList () {
-    // 获取最新主题下的信息
-      this.$axios.get('/api/topics/latest.json')
-        .then((response) => {
+      // 获取最新主题下的信息
+      this.$axios
+        .get('/api/topics/latest.json')
+        .then(response => {
           console.log(response.data)
           this.posts = response.data
           this.loading = false
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error)
         })
     },
@@ -79,6 +86,9 @@ export default {
       console.log('传入的url' + url)
       let newURL = url.replace('/mini/g', 'large')
       console.log('新的url' + newURL)
+    },
+    gotoLink () {
+      this.$router.push('/society/write')
     }
   }
 }
@@ -86,7 +96,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {
@@ -121,7 +132,7 @@ a {
   position: absolute;
   top: 25px;
   left: 100px;
-  background: url('../assets/images/v2ex.png') no-repeat;
+  background: url("../assets/images/v2ex.png") no-repeat;
   background-size: 94px 30px;
 }
 .nav {
