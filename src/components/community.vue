@@ -1,13 +1,16 @@
 <template>
   <el-container class="wrap">
     <el-divider content-position="right">My lab, machine lab.</el-divider>
-    <el-header class="header" height="80px">
+    <el-header class="header"
+               height="10px">
       <el-row>
-        <el-col span=5>
-          <el-button-group>
-            <el-button type="primary" @click="getLatestList">最新</el-button>
-            <el-button type="primary" @click="getHottList">最热</el-button>
-          </el-button-group>
+        <el-col :span=4
+                :offset=2>
+          <el-radio-group v-model="radioOrder"
+                          @change="getList">
+            <el-radio-button label="latest">latest</el-radio-button>
+            <el-radio-button label="hot">hot</el-radio-button>
+          </el-radio-group>
           <!-- <el-breadcrumb separator="/" class="nav">
               <el-breadcrumb-item><a @click="getHotList">最热</a></el-breadcrumb-item>
           <el-breadcrumb-item><a @click="getLatestList">最新</a></el-breadcrumb-item>-->
@@ -15,15 +18,20 @@
           <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
           <!-- </el-breadcrumb> -->
         </el-col>
-        <el-col span=5 offset= 13 >
-          <el-button @click="gotoLink" type="primary">我要发贴</el-button>
+        <el-col :span=4
+                :offset=13>
+          <el-button type="primary"
+                     @click="gotoLink">我要发贴</el-button>
           <!-- <el-link href="/society/write">我要发帖</el-link> -->
         </el-col>
       </el-row>
     </el-header>
-    <el-main class="main" v-loading="loading">
+    <el-main class="main"
+             v-loading="loading">
       <ul>
-        <post v-for=" postData in posts" :key="postData.id" :postData="postData"></post>
+        <post v-for=" postData in posts"
+              :key="postData.post_id"
+              :postData="postData"></post>
       </ul>
     </el-main>
     <el-divider content-position="left">My lab, machine lab.</el-divider>
@@ -42,7 +50,8 @@ export default {
     return {
       msg: '主页',
       posts: {},
-      loading: true
+      loading: true,
+      radioOrder: 'latest'
     }
   },
   created: function () {
@@ -50,13 +59,21 @@ export default {
     this.getHotList()
   },
   methods: {
+    getList () {
+      if (this.radioOrder === 'hot') {
+        this.getHotList()
+      } else if (this.radioOrder === 'latest') {
+        this.getLatestList()
+      }
+    },
     getHotList () {
       // 获取热门主题下的信息
       this.$axios
-        .get('/api/topics/hot.json')
+        .get('/boot/post/get-order-by-like?page-num=2&&page-size=2')
         .then(response => {
-          console.log(response.data)
-          this.posts = response.data
+          console.log('hot list\n')
+          console.log(response.data.list)
+          this.posts = response.data['list']
           this.loading = false
         })
         .catch(error => {
@@ -118,7 +135,7 @@ a {
   height: auto;
 }
 .main {
-  width: 1000px;
+  width: auto;
   min-height: 500px;
 }
 .header {

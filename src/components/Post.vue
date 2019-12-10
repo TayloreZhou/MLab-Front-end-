@@ -1,22 +1,29 @@
 <template>
-      <el-card shadow="hover" class="post">
-        <div slot="header" class="clearfix">
-          <div class="container">
-            <div class="post-prview">
-              <img class="avatar" v-bind:src="postData.member.avatar_mini" alt="avatar">
-              <a class="post-title" @click="handlePostDetail">{{ postData.title }}</a>
-              <el-badge :value="postData.replies" :max="999" class="replies-num">
-                <el-button>回帖</el-button>
-              </el-badge>
-              <a class="author" v-bind:href="postData.member.url">{{ postData.member.username }}</a>
-            </div>
-          </div>
+  <el-card shadow="hover"
+           class="post">
+    <div slot="header"
+         class="clearfix">
+      <div class="container">
+        <div class="ava">
+          <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+          <a class="post-title">{{ postData.title }}</a>
+          <a class="author">{{ postData.username }}</a>
         </div>
-        <div class="content clearfix">
-          <el-button class="node-name" round size="small"># {{ postData.node.title }}</el-button>
-          <el-button class="post-detail" style="float: right;" type="text" v-bind:href="postData.url">查看原帖</el-button>
+        <div class="post-preview">
+          <a class="post-detail">{{ postData.content }}</a>
         </div>
-      </el-card>
+      </div>
+    </div>
+    <div class="content clearfix">
+      <el-button class="node-name"
+                 round
+                 size="small"># {{ postData.node.title }}</el-button>
+      <el-button class="post-detail"
+                 style="float: right;"
+                 type="text"
+                 v-bind:href="postData.url">查看原帖</el-button>
+    </div>
+  </el-card>
 </template>
 
 <script>
@@ -24,14 +31,12 @@ export default {
   name: 'post',
   props: ['postData'],
   data () {
-    return {
-    }
+    return {}
   },
-  mounted: function () {
-  },
+  mounted: function () { },
   methods: {
     handlePostDetail () {
-      this.$router.push({path: '/society/detail/' + this.postData.id})
+      this.$router.push({ path: '/society/detail/' + this.postData.id })
     }
   }
 }
@@ -66,7 +71,7 @@ a {
   line-height: 1.6;
   font-weight: 600;
   overflow: hidden;
-  text-overflow:ellipsis;
+  text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
   float: left;
