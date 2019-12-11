@@ -61,6 +61,7 @@ export default {
     },
     logout () {
       this.$router.push({path: '/login'})
+      this.$store.commit('del_token')
     },
     myJob () {
       this.$router.push({path: '/joblist'})

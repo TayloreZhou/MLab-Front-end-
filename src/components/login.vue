@@ -13,29 +13,22 @@
               <div style="width: 60%;margin: auto">
                 <el-form :model="ruleForm" status-icon :rules="rules"
                          ref="ruleForm" class="demo-ruleForm" style="margin-top: 20px">
-                  <el-form-item label="账号" prop="id">
+                  <el-form-item label="Username" prop="id">
                     <el-input v-model.number="ruleForm.id"></el-input>
                   </el-form-item>
-                  <el-form-item label="密码" prop="pass">
+                  <el-form-item label="Password" prop="pass">
                     <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
                   </el-form-item>
                   <el-form-item>
                     <el-row type="flex" justify="space-around">
                       <el-col>
-                        <router-link to="/register">注册</router-link>
+                        <router-link to="/register">Register</router-link>
                       </el-col>
                       <el-col>
-                        <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+                        <el-button type="primary" @click="submitForm('ruleForm')">Login</el-button>
                       </el-col>
                       <el-col>
-                        <el-button @click="resetForm('ruleForm')">重置</el-button>
-                      </el-col>
-                    </el-row>
-                  </el-form-item>
-                  <el-form-item>
-                    <el-row type="flex" justify="space-around">
-                      <el-col>
-                        <a href="">忘记密码</a>
+                        <el-button @click="resetForm('ruleForm')">Reset</el-button>
                       </el-col>
                     </el-row>
                   </el-form-item>
@@ -66,15 +59,10 @@ export default {
   data () {
     var checkId = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('账号不能为空'))
+        callback(new Error('账号不能为空'))
+      } else {
+        callback()
       }
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error('请输入数字值'))
-        } else {
-          callback()
-        }
-      }, 1000)
     }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
@@ -98,35 +86,41 @@ export default {
         id: [
           { validator: checkId, trigger: 'blur' }
         ]
-      },
-      posts: {}
+      }
     }
   },
   methods: {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$axios.post('http://localhost:8080/web_test_mav_war/HelloWorld?id=1234&pass=1234')
-            .then((response) => {
-              console.log('su')
-              this.posts = response.data
-              if (this.posts.state === 1) {
-                this.$router.push({path: './canvas'})
-              } else {
-                this.$notify.error({
-                  title: '错误',
-                  message: '密码错误'
-                })
+          this.$axios({
+            method: 'post',
+            url: '/server/auth-service/oauth/token?grant_type=password&' +
+              'username=' + this.ruleForm.id + '&password=' + this.ruleForm.pass,
+            headers: {
+              'Authorization': 'Basic YnJvd3NlcjpzZWNyZXQ='
+            }
+          }).then((response) => {
+            if (response.status === 200) {
+              this.$store.commit('set_token', response.data.access_token)
+              if (this.$store.state.token) {
+                this.$router.push('/')
               }
-            })
-            .catch((error) => {
-              console.log(error)
+            } else {
               this.$notify.error({
-                title: '错误',
-                message: '登录失败'
+                title: 'Error',
+                message: 'Password Wrong'
               })
+            }
+          }).catch((error) => {
+            console.log(error)
+            this.$notify.error({
+              title: 'Error',
+              message: 'Login Failure'
             })
+          })
         } else {
+          console.log('fail')
           return false
         }
       })
@@ -139,11 +133,6 @@ export default {
 </script>
 
 <style scoped>
-.bg_log_in{
-  background: url("../assets/bg_login.jpg") no-repeat;
-  background-size: cover;
-  height: 500px;
-}
 .login_form{
   background: rgba(255, 255, 255, 0.75);
   text-align: center;

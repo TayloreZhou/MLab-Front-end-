@@ -18,11 +18,11 @@ module.exports = {
           '^/api': '/api'
         }
       },
-      '/boot': {
-        target: 'http://localhost:8084',
+      '/server': {
+        target: 'http://localhost:8070',
         changeOrigin: true,
         pathRewrite: {
-          '^/boot': ''
+          '^/server': '/'
         }
       },
       '/image': {
