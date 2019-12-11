@@ -8,11 +8,13 @@ import router from './router'
 import axios from 'axios'
 import store from './store/store'
 import uploader from 'vue-simple-uploader'
+import moment from 'moment'
 
 // process.env.Mock && require('./mock.js')
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
+Vue.prototype.$moment = moment
 
 Vue.use(ElementUI)
 Vue.use(uploader)

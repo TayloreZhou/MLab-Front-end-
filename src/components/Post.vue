@@ -23,8 +23,8 @@
       </div>
     </div>
     <div class="description">
-      <a>{{ postData.likeNum }} like, {{ postData.commentNum }} comment </a>
-      <span style="float: right">{{postData.createTime}}</span>
+      <a>{{ postData.likeNum }} like, {{ postData.commentNum}} comment </a>
+      <span style="float: right">{{$moment(postData.createTime).format('YYYY-MM-DD HH:MM')}}</span>
     </div>
   </el-card>
 </template>
