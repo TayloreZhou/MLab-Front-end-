@@ -37,7 +37,12 @@ export default {
   },
   methods: {
     handlePostDetail () {
-      this.$router.push({ path: '/society/detail' })
+      this.$router.push({
+        path: '/society/detail/',
+        query: {
+          postId: this.postData.postId
+        }
+      })
     }
   }
 }

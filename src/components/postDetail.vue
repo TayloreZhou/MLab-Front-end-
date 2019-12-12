@@ -2,7 +2,33 @@
   <div>
     <el-divider content-position="right">My lab, machine lab.</el-divider>
     <el-container>
-      <el-container class="wrap">
+      <el-container class="wrap"
+                    direction="vertical">
+        <el-main>
+          <el-card direction="horizontal">
+            <div slot="header"
+                 style="height:20px">
+              <el-avatar class="avatar"
+                         fit="fill"
+                         :src="myHeader"></el-avatar>
+              <a class="author">{{postData.username}}</a>
+            </div>
+            <div class="post-detail">
+              <a class="post-title">{{postData.title}}</a>
+              <a class="post-description">{{$moment(postData.createTime).format('YYYY-MM-DD HH:MM')}}</a>
+              <p class="post-content">{{postData.content}}</p>
+            </div>
+            <div>
+              <a class="comment-num">{{postData.commentNum}} comment</a>
+              <el-button :icon="likeIcon"
+                         :type="likeType"
+                         @click="handleLike"
+                         class="like-button">{{postData.likeNum}} </el-button>
+            </div>
+            <div>
+            </div>
+          </el-card>
+        </el-main>
         <el-main>
           <div v-clickoutside="hideReplyBtn"
                @click="inputFocus"
@@ -225,10 +251,31 @@ export default {
           inputShow: false,
           reply: []
         }
-      ]
+      ],
+      postId: '',
+      postData: {},
+      likeIcon: 'el-icon-star-off',
+      likeType: 'primary',
+      author: ''
     }
   },
   directives: { clickoutside },
+  created: function () {
+    this.postId = this.$route.query.postId
+    console.log(this.postId)
+    this.$axios
+      .get('/boot/post/' + this.postId)
+      .then(response => {
+        console.log('post data\n')
+        console.log(response.data)
+        this.postData = response.data
+        this.author = response.data.username
+        this.checkPostLike()
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
   methods: {
     inputFocus () {
       var replyInput = document.getElementById('replyInput')
@@ -328,6 +375,25 @@ export default {
         // 超过30天ddd
         date = new Date(parseInt(date))
         return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
+      }
+    },
+    checkPostLike () {
+      this.$axios
+        .get('/boot/like/check?user=' + this.author + '&&type=0&&type-id=' + this.postId)
+        .then(response => {
+          console.log(response.data)
+          if (response.data === true) {
+            this.likeType = 'primary'
+          } else {
+            this.likeType = ''
+          }
+        })
+    },
+    handleLike () {
+      if (this.likeType === '') {
+        this.likeType = 'primary'
+      } else if (this.likeType === 'primary') {
+        this.likeType = ''
       }
     }
   }
@@ -472,11 +538,73 @@ export default {
     margin: 10px 0 0 50px;
     background-color: #efefef;
   }
+}
 
-  .wrap {
-    width: 1000px;
-    margin: 0 auto;
-    height: auto;
-  }
+.wrap {
+  width: 1000px;
+  margin: 0 auto;
+  height: auto;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  float: left;
+}
+
+.author {
+  padding-left: 10px;
+  color: #3293ee;
+  float: left;
+}
+
+.post-detail {
+  text-align: left;
+}
+
+.post-content {
+  width: 100%;
+  padding: auto;
+  text-align: left;
+}
+
+.post-description {
+  font-size: 16px;
+  padding: auto;
+  text-align: right;
+  color: gray;
+}
+
+.post-title {
+  width: 100%;
+  padding-top: 0px;
+  color: #1a1a1a;
+  text-align: left;
+  font-size: 24px;
+  line-height: 1.6;
+  font-weight: 600;
+  overflow: auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  float: left;
+}
+
+.usercard {
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.like-button {
+  float: right;
+  padding: auto;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.comment-num {
+  float: right;
+  padding: auto;
+  padding-right: 10px;
+  padding-top: 8px;
 }
 </style>
