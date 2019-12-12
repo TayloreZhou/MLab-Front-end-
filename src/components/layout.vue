@@ -20,8 +20,9 @@
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item icon="el-icon-plus" @click.native="myInfo">我的信息</el-dropdown-item>
-                  <el-dropdown-item icon="el-icon-circle-plus" @click.native="myJob">我的作业</el-dropdown-item>
-                  <el-dropdown-item icon="el-icon-circle-plus" @click.native="myPost">我的作业</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-circle-plus" @click.native="modeList">我的模型</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-circle-plus" @click.native="myJob">训练列表</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-circle-plus" @click.native="myPost">预测列表</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-circle-plus-outline" @click.native="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -64,6 +65,9 @@ export default {
     },
     myJob () {
       this.$router.push({path: '/joblist'})
+    },
+    modeList () {
+      this.$router.push({path: '/modellist'})
     }
   }
 }

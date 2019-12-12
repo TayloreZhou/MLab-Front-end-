@@ -6,22 +6,37 @@
         <div id="accordion">
           <h4 @click="showPaletteLevel1">Input Layer</h4>
           <div>
-            <div id="myPaletteLevel1" style="display:none" class="myPaletteDiv" ></div>
+            <div
+              id="myPaletteLevel1"
+              style="display:none"
+              class="myPaletteDiv"
+            ></div>
           </div>
           <h4 @click="showPaletteLevel2">Node layer</h4>
           <div>
-            <div id="myPaletteLevel2" style="display:none" class="myPaletteDiv"></div>
+            <div
+              id="myPaletteLevel2"
+              style="display:none"
+              class="myPaletteDiv"
+            ></div>
           </div>
           <h4 @click="showPaletteLevel3">Output Layer</h4>
           <div>
-            <div id="myPaletteLevel3" style="display:none" class="myPaletteDiv"></div>
+            <div
+              id="myPaletteLevel3"
+              style="display:none"
+              class="myPaletteDiv"
+            ></div>
           </div>
         </div>
       </div>
       <div id="myDiagramDiv"></div>
       <div id="infoBar" class="inspector"></div>
-      <div style="position: fixed;margin-left: 100px;margin-bottom: 100px">
-        <el-button @click="myModel"></el-button>
+      <div id="subbmitButton">
+        <el-button @click="commit" type="primary" round>提交</el-button>
+      </div>
+      <div style="position: fixed; right: 100px; top: 200px">
+        <el-button @click="myModel" ></el-button>
       </div>
     </div>
   </div>
@@ -47,18 +62,38 @@ export default {
     this.$nextTick(() => {
       var mySelf = this
       // initialize the first Palette
-      var graygrad = MAKE(go.Brush, 'Linear',
-        { 0: 'white', 0.1: 'whitesmoke', 0.9: 'whitesmoke', 1: 'lightgray' })
-      var outputNodeTemplateForPalette = MAKE(go.Node, 'Spot',
-        { selectionAdorned: false, textEditable: true, locationObjectName: 'BODY' },
-        new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+      var graygrad = MAKE(go.Brush, 'Linear', {
+        0: 'white',
+        0.1: 'whitesmoke',
+        0.9: 'whitesmoke',
+        1: 'lightgray'
+      })
+      var outputNodeTemplateForPalette = MAKE(
+        go.Node,
+        'Spot',
+        {
+          selectionAdorned: false,
+          textEditable: true,
+          locationObjectName: 'BODY'
+        },
+        new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(
+          go.Point.stringify
+        ),
         // the main body consists of a Rectangle surrounding the text
-        MAKE(go.Panel, 'Auto',
+        MAKE(
+          go.Panel,
+          'Auto',
           { name: 'BODY' },
-          MAKE(go.Shape, 'Rectangle',
+          MAKE(
+            go.Shape,
+            'Rectangle',
             { fill: graygrad, stroke: 'gray', minSize: new go.Size(120, 21) },
-            new go.Binding('fill', 'isSelected', function (s) { return s ? 'dodgerblue' : graygrad }).ofObject()),
-          MAKE(go.TextBlock,
+            new go.Binding('fill', 'isSelected', function (s) {
+              return s ? 'dodgerblue' : graygrad
+            }).ofObject()
+          ),
+          MAKE(
+            go.TextBlock,
             {
               stroke: 'black',
               font: '12px sans-serif',
@@ -66,27 +101,54 @@ export default {
               margin: new go.Margin(3, 3 + 11, 3, 3 + 4),
               alignment: go.Spot.Left
             },
-            new go.Binding('text', 'name'))
+            new go.Binding('text', 'name')
+          )
         ),
         // input port
-        MAKE(go.Panel, 'Auto',
+        MAKE(
+          go.Panel,
+          'Auto',
           { alignment: go.Spot.Left, portId: 'to', toLinkable: true },
-          MAKE(go.Shape, 'Circle',
-            { width: 8, height: 8, fill: 'white', stroke: 'gray' }),
-          MAKE(go.Shape, 'Circle',
-            { width: 4, height: 4, fill: 'dodgerblue', stroke: null })
+          MAKE(go.Shape, 'Circle', {
+            width: 8,
+            height: 8,
+            fill: 'white',
+            stroke: 'gray'
+          }),
+          MAKE(go.Shape, 'Circle', {
+            width: 4,
+            height: 4,
+            fill: 'dodgerblue',
+            stroke: null
+          })
         )
       )
-      var inputNodeTemplateForPalette = MAKE(go.Node, 'Spot',
-        { selectionAdorned: false, textEditable: true, locationObjectName: 'BODY' },
-        new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+      var inputNodeTemplateForPalette = MAKE(
+        go.Node,
+        'Spot',
+        {
+          selectionAdorned: false,
+          textEditable: true,
+          locationObjectName: 'BODY'
+        },
+        new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(
+          go.Point.stringify
+        ),
         // the main body consists of a Rectangle surrounding the text
-        MAKE(go.Panel, 'Auto',
+        MAKE(
+          go.Panel,
+          'Auto',
           { name: 'BODY' },
-          MAKE(go.Shape, 'Rectangle',
+          MAKE(
+            go.Shape,
+            'Rectangle',
             { fill: graygrad, stroke: 'gray', minSize: new go.Size(120, 21) },
-            new go.Binding('fill', 'isSelected', function (s) { return s ? 'dodgerblue' : graygrad }).ofObject()),
-          MAKE(go.TextBlock,
+            new go.Binding('fill', 'isSelected', function (s) {
+              return s ? 'dodgerblue' : graygrad
+            }).ofObject()
+          ),
+          MAKE(
+            go.TextBlock,
             {
               stroke: 'black',
               font: '12px sans-serif',
@@ -94,28 +156,62 @@ export default {
               margin: new go.Margin(3, 3 + 11, 3, 3 + 4),
               alignment: go.Spot.Left
             },
-            new go.Binding('text', 'name'))
+            new go.Binding('text', 'name')
+          )
         ),
         // output port
-        MAKE(go.Panel, 'Auto',
-          { alignment: go.Spot.Right, portId: 'from', fromLinkable: true, click: this.addNodeAndLink },
-          MAKE(go.Shape, 'Circle',
-            { width: 22, height: 22, fill: 'white', stroke: 'dodgerblue', strokeWidth: 3 }),
-          MAKE(go.Shape, 'PlusLine',
-            { width: 11, height: 11, fill: null, stroke: 'dodgerblue', strokeWidth: 3 })
+        MAKE(
+          go.Panel,
+          'Auto',
+          {
+            alignment: go.Spot.Right,
+            portId: 'from',
+            fromLinkable: true,
+            click: this.addNodeAndLink
+          },
+          MAKE(go.Shape, 'Circle', {
+            width: 22,
+            height: 22,
+            fill: 'white',
+            stroke: 'dodgerblue',
+            strokeWidth: 3
+          }),
+          MAKE(go.Shape, 'PlusLine', {
+            width: 11,
+            height: 11,
+            fill: null,
+            stroke: 'dodgerblue',
+            strokeWidth: 3
+          })
         )
       )
 
-      var layerNodeTemplateForPalette = MAKE(go.Node, 'Spot',
-        { selectionAdorned: false, textEditable: true, locationObjectName: 'BODY' },
-        new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
+      var layerNodeTemplateForPalette = MAKE(
+        go.Node,
+        'Spot',
+        {
+          selectionAdorned: false,
+          textEditable: true,
+          locationObjectName: 'BODY'
+        },
+        new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(
+          go.Point.stringify
+        ),
         // the main body consists of a Rectangle surrounding the text
-        MAKE(go.Panel, 'Auto',
+        MAKE(
+          go.Panel,
+          'Auto',
           { name: 'BODY' },
-          MAKE(go.Shape, 'Rectangle',
+          MAKE(
+            go.Shape,
+            'Rectangle',
             { fill: graygrad, stroke: 'gray', minSize: new go.Size(120, 21) },
-            new go.Binding('fill', 'isSelected', function (s) { return s ? 'dodgerblue' : graygrad }).ofObject()),
-          MAKE(go.TextBlock,
+            new go.Binding('fill', 'isSelected', function (s) {
+              return s ? 'dodgerblue' : graygrad
+            }).ofObject()
+          ),
+          MAKE(
+            go.TextBlock,
             {
               stroke: 'black',
               font: '12px sans-serif',
@@ -123,23 +219,52 @@ export default {
               margin: new go.Margin(3, 3 + 11, 3, 3 + 4),
               alignment: go.Spot.Left
             },
-            new go.Binding('text', 'name'))
+            new go.Binding('text', 'name')
+          )
         ),
         // output port
-        MAKE(go.Panel, 'Auto',
-          { alignment: go.Spot.Right, portId: 'from', fromLinkable: true, cursor: 'pointer', click: this.addNodeAndLink },
-          MAKE(go.Shape, 'Circle',
-            { width: 22, height: 22, fill: 'white', stroke: 'dodgerblue', strokeWidth: 3 }),
-          MAKE(go.Shape, 'PlusLine',
-            { width: 11, height: 11, fill: null, stroke: 'dodgerblue', strokeWidth: 3 })
+        MAKE(
+          go.Panel,
+          'Auto',
+          {
+            alignment: go.Spot.Right,
+            portId: 'from',
+            fromLinkable: true,
+            cursor: 'pointer',
+            click: this.addNodeAndLink
+          },
+          MAKE(go.Shape, 'Circle', {
+            width: 22,
+            height: 22,
+            fill: 'white',
+            stroke: 'dodgerblue',
+            strokeWidth: 3
+          }),
+          MAKE(go.Shape, 'PlusLine', {
+            width: 11,
+            height: 11,
+            fill: null,
+            stroke: 'dodgerblue',
+            strokeWidth: 3
+          })
         ),
         // input port
-        MAKE(go.Panel, 'Auto',
+        MAKE(
+          go.Panel,
+          'Auto',
           { alignment: go.Spot.Left, portId: 'to', toLinkable: true },
-          MAKE(go.Shape, 'Circle',
-            { width: 8, height: 8, fill: 'white', stroke: 'gray' }),
-          MAKE(go.Shape, 'Circle',
-            { width: 4, height: 4, fill: 'dodgerblue', stroke: null })
+          MAKE(go.Shape, 'Circle', {
+            width: 8,
+            height: 8,
+            fill: 'white',
+            stroke: 'gray'
+          }),
+          MAKE(go.Shape, 'Circle', {
+            width: 4,
+            height: 4,
+            fill: 'dodgerblue',
+            stroke: null
+          })
         )
       )
       var palNodeTemplateMap = new go.Map()
@@ -171,7 +296,9 @@ export default {
         console.log(e.subject.part)
       })
 
-      mySelf.myDiagram.addDiagramListener('BackgroundSingleClicked', function (e) {
+      mySelf.myDiagram.addDiagramListener('BackgroundSingleClicked', function (
+        e
+      ) {
         debugger
         console.log('Double-clicked at' + e.diagram.lastInput.documentPoint)
       })
@@ -182,14 +309,28 @@ export default {
       })
 
       mySelf.myDiagram.nodeTemplateMap = palNodeTemplateMap
-      mySelf.myDiagram.linkTemplate = MAKE(go.Link,
-        { selectionAdorned: false, fromPortId: 'from', toPortId: 'to', relinkableTo: true },
-        MAKE(go.Shape,
+      mySelf.myDiagram.linkTemplate = MAKE(
+        go.Link,
+        {
+          selectionAdorned: false,
+          fromPortId: 'from',
+          toPortId: 'to',
+          relinkableTo: true
+        },
+        MAKE(
+          go.Shape,
           { stroke: 'gray', strokeWidth: 2 },
           {
-            mouseEnter: function (e, obj) { obj.strokeWidth = 5; obj.stroke = 'dodgerblue' },
-            mouseLeave: function (e, obj) { obj.strokeWidth = 2; obj.stroke = 'gray' }
-          })
+            mouseEnter: function (e, obj) {
+              obj.strokeWidth = 5
+              obj.stroke = 'dodgerblue'
+            },
+            mouseLeave: function (e, obj) {
+              obj.strokeWidth = 2
+              obj.stroke = 'gray'
+            }
+          }
+        )
       )
 
       let myModel = MAKE(go.GraphLinksModel) // 也可以创建link model;需要配置myModel.linkDataArray 如下
@@ -197,26 +338,25 @@ export default {
       myModel.linkDataArray = []
       mySelf.myDiagram.model = myModel
       // eslint-disable-next-line no-unused-vars,no-undef
-      var inspector = new Inspector('infoBar', this.myDiagram,
-        {
-          properties: {
-            // key would be automatically added for nodes, but we want to declare it read-only also:
-            // eslint-disable-next-line no-undef
-            'key': { readOnly: true, show: Inspector.showIfPresent },
-            'category': { readOnly: true, show: Inspector.showIfPresent },
-            'name': { show: Inspector.showIfPresent },
-            'InputCol': { show: Inspector.showIfPresent },
-            'OutputCol': { show: Inspector.showIfPresent },
-            'fileName': {
-              show: Inspector.showIfPresent,
-              type: 'select',
-              choices: function (node, propName) {
-                if (Array.isArray(node.data.choices)) return node.data.choices
-                return ['one', 'two', 'three', 'four', 'five']
-              }
+      var inspector = new Inspector('infoBar', this.myDiagram, {
+        properties: {
+          // key would be automatically added for nodes, but we want to declare it read-only also:
+          // eslint-disable-next-line no-undef
+          key: { readOnly: true, show: Inspector.showIfPresent },
+          category: { readOnly: true, show: Inspector.showIfPresent },
+          name: { show: Inspector.showIfPresent },
+          InputCol: { show: Inspector.showIfPresent },
+          OutputCol: { show: Inspector.showIfPresent },
+          fileName: {
+            show: Inspector.showIfPresent,
+            type: 'select',
+            choices: function (node, propName) {
+              if (Array.isArray(node.data.choices)) return node.data.choices
+              return ['one', 'two', 'three', 'four', 'five']
             }
           }
-        })
+        }
+      })
       this.init()
     })
   },
@@ -252,24 +392,38 @@ export default {
         copiesArrays: true,
         copiesArrayObjects: true,
         nodeDataArray: [
-          {key: 101, category: 'Input', name: 'InputNode', fileName: ''}
+          { key: 101, category: 'Input', name: 'InputNode', fileName: '' }
         ]
       })
       myPaletteLevel2.model = MAKE(go.GraphLinksModel, {
         copiesArrays: true,
         copiesArrayObjects: true,
         nodeDataArray: [
-          {key: 201, category: 'HashingTF', name: 'HashingTFNode', InputCol: 3, OutputCol: 3},
-          {key: 202, category: 'LogisticRegression', name: 'LogisticRegressionNode'},
-          {key: 203, category: 'Tokenizer', name: 'TokenizerNode', InputCol: 3, OutputCol: 3}
+          {
+            key: 201,
+            category: 'HashingTF',
+            name: 'HashingTFNode',
+            InputCol: 3,
+            OutputCol: 3
+          },
+          {
+            key: 202,
+            category: 'LogisticRegression',
+            name: 'LogisticRegressionNode'
+          },
+          {
+            key: 203,
+            category: 'Tokenizer',
+            name: 'TokenizerNode',
+            InputCol: 3,
+            OutputCol: 3
+          }
         ]
       })
       myPaletteLevel3.model = MAKE(go.GraphLinksModel, {
         copiesArrays: true,
         copiesArrayObjects: true,
-        nodeDataArray: [
-          {key: 301, category: 'Output', name: 'OutputNode'}
-        ]
+        nodeDataArray: [{ key: 301, category: 'Output', name: 'OutputNode' }]
       })
     },
     addNodeAndLink (e, obj) {
@@ -284,16 +438,27 @@ export default {
         if (!(node instanceof go.Node)) return
         // look for Parts overlapping the node
         while (true) {
-          var exist = this.myDiagram.findObjectsIn(node.actualBounds,
-            // only consider Parts
-            function (obj) { return obj.part },
-            // ignore Links and the dropped node itself
-            function (part) { return part instanceof go.Node && part !== node },
-            // check for any overlap, not complete containment
-            true).first()
+          var exist = this.myDiagram
+            .findObjectsIn(
+              node.actualBounds,
+              // only consider Parts
+              function (obj) {
+                return obj.part
+              },
+              // ignore Links and the dropped node itself
+              function (part) {
+                return part instanceof go.Node && part !== node
+              },
+              // check for any overlap, not complete containment
+              true
+            )
+            .first()
           if (exist === null) break
           // try shifting down beyond the existing node to see if there's empty space
-          node.position = new go.Point(node.actualBounds.x, exist.actualBounds.bottom + 10)
+          node.position = new go.Point(
+            node.actualBounds.x,
+            exist.actualBounds.bottom + 10
+          )
         }
       })
     },
@@ -301,12 +466,15 @@ export default {
     keyCompare (a, b) {
       var at = a.data.key
       var bt = b.data.key
-      if (at < bt) { return -1 }
-      if (at > bt) { return 1 }
+      if (at < bt) {
+        return -1
+      }
+      if (at > bt) {
+        return 1
+      }
       return 0
     },
-    onSubmit () {
-    },
+    onSubmit () {},
     showPaletteLevel1 () {
       if (this.stateP1 === 0) {
         $('#myPaletteLevel1').slideDown()
@@ -335,76 +503,103 @@ export default {
       }
     },
     myModel () {
-      console.log(this.myDiagram.model.toJSON())
+      if (typeof WebSocket === 'undefined') {
+        console.log('您的浏览器不支持WebSocket')
+      } else {
+        console.log('您的浏览器支持WebSocket')
+        var socketUrl = 'http://localhost:8080/api/websocket/1001'
+        socketUrl = socketUrl.replace('https', 'ws').replace('http', 'ws')
+        console.log(socketUrl)
+        var socket = new WebSocket(socketUrl)
+
+        socket.onopen = function () {
+          console.log('websocket已打开')
+        }
+        socket.onmessage = function (msg) {
+          console.log(msg.data)
+        }
+        socket.onclose = function () {
+          console.log('websocket已关闭')
+        }
+        socket.onerror = function () {
+          console.log('websocket发生了错误')
+        }
+      }
     }
   }
 }
 </script>
 
 <style type="text/css" scoped>
-  /* for BPMN.html */
+/* for BPMN.html */
 
-  /* Diagram and palette area */
+/* Diagram and palette area */
 
-  #myDiagramDiv {
-    float: left;
-    width: 60%;
-    height: 650px;
-    background-color: white;
-  }
+#myDiagramDiv {
+  float: left;
+  width: 60%;
+  height: 650px;
+  background-color: white;
+}
 
-  #PaletteAndDiagram {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-  }
+#PaletteAndDiagram {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
 
-  #sideBar {
-    float: left;
-    width: 20%;
-    height: 650px;
-    overflow-y:auto;
-    overflow-x:hidden;
-  }
+#sideBar {
+  float: left;
+  width: 20%;
+  height: 650px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
-  #infoBar {
-    float: left;
-    width: 20%;
-    height: 650px;
-  }
+#infoBar {
+  float: left;
+  width: 20%;
+  height: 650px;
+}
 
-  .myPaletteDiv {
-    width: 100%;
-    min-height: 150px;
-  }
+#subbmitButton {
+  position: relative;
+  bottom: 40px;
+  right: -500px;
+}
 
-  #accordion {
-    margin: 0px;
-    width: 97%;
-    min-height: 625px;
-  }
+.myPaletteDiv {
+  width: 100%;
+  min-height: 150px;
+}
 
-  .ui-accordion .ui-accordion-content {
-    padding: 1px;
-  }
+#accordion {
+  margin: 0px;
+  width: 97%;
+  min-height: 625px;
+}
 
-  #menuui > li {
-    float: left;
-  }
+.ui-accordion .ui-accordion-content {
+  padding: 1px;
+}
 
-  input {
-    text-align: center;
-    font-size: large;
-    float: left;
-  }
+#menuui > li {
+  float: left;
+}
 
-  figure {
-    display: inline-block;
-    margin: 10px;
-  }
+input {
+  text-align: center;
+  font-size: large;
+  float: left;
+}
 
-  .inspector{
-    background: white;
-    color: black;
-  }
+figure {
+  display: inline-block;
+  margin: 10px;
+}
+
+.inspector {
+  background: white;
+  color: black;
+}
 </style>
