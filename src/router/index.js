@@ -8,7 +8,7 @@ import canvas from '../components/canvas'
 import trainlist from '../components/trainlist'
 import predictlist from '../components/predictlist'
 import community from '../components/community'
-import articleDetail from '../components/articleDetail'
+import postDetail from '../components/articleDetail'
 import article from '../components/article'
 import uploader from '../components/uploader'
 import uploaderBoot from '../components/upload_boot/uploaderBoot'
@@ -42,7 +42,7 @@ export default new Router({
         {
           path: '/society/detail/:id',
           name: 'detail',
-          component: articleDetail
+          component: postDetail
         },
         {
           path: '/society/write',

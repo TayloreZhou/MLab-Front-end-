@@ -11,19 +11,15 @@
                  alt="avatar">
             <a class="author">{{ postData.username }}</a>
           </div>
-          <!-- <el-button>回帖</el-button> -->
           <div>
             <a class="post-title"
                @click="handlePostDetail">{{ postData.title }}</a>
           </div>
-          <!-- <div class="post-detail">
-            <a>{{ postData.content }}</a>
-          </div> -->
         </div>
       </div>
     </div>
     <div class="description">
-      <a>{{ postData.likeNum }} like, {{ postData.commentNum}} comment </a>
+      <span>{{ postData.likeNum }} like, {{ postData.commentNum}} comment </span>
       <span style="float: right">{{$moment(postData.createTime).format('YYYY-MM-DD HH:MM')}}</span>
     </div>
   </el-card>
@@ -41,7 +37,7 @@ export default {
   },
   methods: {
     handlePostDetail () {
-      this.$router.push({ path: '/society/detail/' + this.postData.id })
+      this.$router.push({ path: '/society/postDetail/' + this.postData.postId })
     }
   }
 }

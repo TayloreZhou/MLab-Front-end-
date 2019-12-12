@@ -12,12 +12,6 @@
               <el-radio-button label="latest">latest</el-radio-button>
               <el-radio-button label="hot">hot</el-radio-button>
             </el-radio-group>
-            <!-- <el-breadcrumb separator="/" class="nav">
-              <el-breadcrumb-item><a @click="getHotList">最热</a></el-breadcrumb-item>
-          <el-breadcrumb-item><a @click="getLatestList">最新</a></el-breadcrumb-item>-->
-            <!-- <el-breadcrumb-item><a href="/nodes">节点</a></el-breadcrumb-item> -->
-            <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
-            <!-- </el-breadcrumb> -->
           </el-col>
           <el-col :span=4
                   :offset=15>
@@ -42,7 +36,6 @@
                        :page-count="pages"
                        :current-page.sync="currentPage"></el-pagination>
       </el-main>
-      <el-divider content-position="left">My lab, machine lab.</el-divider>
     </el-container>
     <el-aside class="usercard">
       <el-card>
@@ -104,7 +97,7 @@ export default {
     getHotList (pageNum) {
       // 获取热门主题下的信息
       this.$axios
-        .get('/boot/post/get-order-by-like?page-num=' + pageNum + '&&page-size=5')
+        .get('/boot/post/get-order-by-like?page-num=' + pageNum + '&&page-size=3')
         .then(response => {
           console.log('hot list\n')
           console.log(response.data)
@@ -120,7 +113,7 @@ export default {
     getLatestList (pageNum) {
       // 获取最新主题下的信息
       this.$axios
-        .get('/boot/post/get-order-by-time?page-num=' + pageNum + '&&page-size=5')
+        .get('/boot/post/get-order-by-time?page-num=' + pageNum + '&&page-size=3')
         .then(response => {
           console.log('latest list\n')
           console.log(response.data)
