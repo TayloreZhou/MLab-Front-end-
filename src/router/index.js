@@ -40,7 +40,7 @@ export default new Router({
           component: community
         },
         {
-          path: '/society/detail/',
+          path: '/society/detail',
           name: 'detail',
           component: postDetail
         },

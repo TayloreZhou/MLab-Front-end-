@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <div class="container"
+       :style="{minHeight: minHeight + 'px'}">
     <el-container>
       <el-header>
         <el-row>
@@ -81,7 +82,15 @@ export default {
   name: 'layout',
   data () {
     return {
-      searchInput: ''
+      searchInput: '',
+      minHeight: 0
+    }
+  },
+  mounted () {
+    this.minHeight = document.documentElement.clientHeight - 170
+    var that = this
+    window.onresize = function () {
+      that.minHeight = document.documentElement.clientHeight - 170
     }
   },
   methods: {

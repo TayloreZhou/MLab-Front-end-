@@ -1,56 +1,58 @@
 <template>
-  <el-container>
-    <el-container class="wrap">
-      <el-divider content-position="right">My lab, machine lab.</el-divider>
-      <el-header class="header"
-                 height="10px">
-        <el-row>
-          <el-col :span=4
-                  :offset=1>
-            <el-radio-group v-model="radioOrder"
-                            @change="handleRadioChange">
-              <el-radio-button label="latest">latest</el-radio-button>
-              <el-radio-button label="hot">hot</el-radio-button>
-            </el-radio-group>
-          </el-col>
-          <el-col :span=4
-                  :offset=15>
-            <el-button type="primary"
-                       @click="gotoLink">Create Post!</el-button>
-            <!-- <el-link href="/society/write">我要发帖</el-link> -->
-          </el-col>
-        </el-row>
-      </el-header>
-      <el-main class="main"
-               v-loading="loading">
-        <ul>
-          <post v-for=" postData in posts"
-                :key="postData.post_id"
-                :postData="postData"></post>
-        </ul>
-        <el-pagination :key="pageshow"
-                       @current-change="handleCurrentChange"
-                       @prev-click="handlePrevClick"
-                       @next-click="handleNextClick"
-                       :page-size="pageSize"
-                       :page-count="pages"
-                       :current-page.sync="currentPage"></el-pagination>
-      </el-main>
+  <div>
+    <el-divider content-position="right">My lab, machine lab.</el-divider>
+    <el-container>
+      <el-container class="wrap">
+        <el-header class="header"
+                   height="10px">
+          <el-row>
+            <el-col :span=4
+                    :offset=1>
+              <el-radio-group v-model="radioOrder"
+                              @change="handleRadioChange">
+                <el-radio-button label="latest">latest</el-radio-button>
+                <el-radio-button label="hot">hot</el-radio-button>
+              </el-radio-group>
+            </el-col>
+            <el-col :span=4
+                    :offset=15>
+              <el-button type="primary"
+                         @click="gotoLink">Create Post!</el-button>
+              <!-- <el-link href="/society/write">我要发帖</el-link> -->
+            </el-col>
+          </el-row>
+        </el-header>
+        <el-main class="main"
+                 v-loading="loading">
+          <ul>
+            <post v-for=" postData in posts"
+                  :key="postData.post_id"
+                  :postData="postData"></post>
+          </ul>
+          <el-pagination :key="pageshow"
+                         @current-change="handleCurrentChange"
+                         @prev-click="handlePrevClick"
+                         @next-click="handleNextClick"
+                         :page-size="pageSize"
+                         :page-count="pages"
+                         :current-page.sync="currentPage"></el-pagination>
+        </el-main>
+      </el-container>
+      <el-aside class="usercard">
+        <el-card>
+          <div slot="header">
+            <el-avatar :size="150"
+                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+          </div>
+          <div>
+            <a>username</a></div>
+          <div>
+            <a>email</a></div>
+          <div><a>like_num</a></div>
+        </el-card>
+      </el-aside>
     </el-container>
-    <el-aside class="usercard">
-      <el-card>
-        <div slot="header">
-          <el-avatar :size="150"
-                     src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-        </div>
-        <div>
-          <a>username</a></div>
-        <div>
-          <a>email</a></div>
-        <div><a>like_num</a></div>
-      </el-card>
-    </el-aside>
-  </el-container>
+  </div>
 </template>
 
 <script>
@@ -67,7 +69,7 @@ export default {
       posts: {},
       loading: true,
       radioOrder: 'hot',
-      pageSize: 5,
+      pageSize: 10,
       pages: 1,
       currentPage: 1,
       pageshow: true
@@ -97,7 +99,7 @@ export default {
     getHotList (pageNum) {
       // 获取热门主题下的信息
       this.$axios
-        .get('/boot/post/get-order-by-like?page-num=' + pageNum + '&&page-size=3')
+        .get('/boot/post/get-order-by-like?page-num=' + pageNum + '&&page-size=' + this.pageSize)
         .then(response => {
           console.log('hot list\n')
           console.log(response.data)
@@ -113,7 +115,7 @@ export default {
     getLatestList (pageNum) {
       // 获取最新主题下的信息
       this.$axios
-        .get('/boot/post/get-order-by-time?page-num=' + pageNum + '&&page-size=3')
+        .get('/boot/post/get-order-by-time?page-num=' + pageNum + '&&page-size=' + this.pageSize)
         .then(response => {
           console.log('latest list\n')
           console.log(response.data)
