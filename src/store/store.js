@@ -5,7 +5,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     count: 0,
-    token: localStorage.getItem('token')
+    token: localStorage.getItem('token'),
+    username: localStorage.getItem('username')
   },
   mutations: {
     increment (state) {
@@ -18,6 +19,14 @@ const store = new Vuex.Store({
     del_token (state) {
       state.token = ''
       localStorage.removeItem('token')
+    },
+    set_username (state, username) {
+      state.username = username
+      localStorage.setItem('username', username)
+    },
+    del_username (state, username) {
+      state.username = ''
+      localStorage.removeItem('username')
     }
   }
 })

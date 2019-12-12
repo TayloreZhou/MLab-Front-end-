@@ -103,6 +103,7 @@ export default {
           }).then((response) => {
             if (response.status === 200) {
               this.$store.commit('set_token', response.data.access_token)
+              this.$store.commit('set_username', this.ruleForm.id)
               if (this.$store.state.token) {
                 this.$router.push('/')
               }

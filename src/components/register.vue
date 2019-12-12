@@ -15,18 +15,21 @@
       <el-row type="flex" justify="center">
         <el-col :span="6" style="margin: 70px 0px">
           <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="密码" prop="pass">
+            <el-form-item label="Username" prop="username">
+              <el-input v-model="ruleForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="Password" prop="pass">
               <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码" prop="checkPass">
+            <el-form-item label="Confirm" prop="checkPass">
               <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="年龄" prop="age">
-              <el-input v-model.number="ruleForm.age"></el-input>
+            <el-form-item label="Email" prop="email">
+              <el-input type="email" v-model="ruleForm.email" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
-              <el-button @click="resetForm('ruleForm')">重置</el-button>
+              <el-button type="primary" @click="submitForm('ruleForm')">Submit</el-button>
+              <el-button @click="resetForm('ruleForm')">Reset</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -52,22 +55,6 @@
 export default {
   name: 'register',
   data () {
-    var checkAge = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('年龄不能为空'))
-      }
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error('请输入数字值'))
-        } else {
-          if (value < 18) {
-            callback(new Error('必须年满18岁'))
-          } else {
-            callback()
-          }
-        }
-      }, 1000)
-    }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'))
@@ -89,9 +76,10 @@ export default {
     }
     return {
       ruleForm: {
-        pass: '',
+        username: '',
+        password: '',
         checkPass: '',
-        age: ''
+        email: ''
       },
       rules: {
         pass: [
@@ -99,9 +87,6 @@ export default {
         ],
         checkPass: [
           { validator: validatePass2, trigger: 'blur' }
-        ],
-        age: [
-          { validator: checkAge, trigger: 'blur' }
         ]
       }
     }
@@ -110,9 +95,23 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
+          this.$axios.post('/server/user-service/register', {
+            'username': this.ruleForm.username,
+            'password': this.ruleForm.password,
+            'email': this.ruleForm.email,
+            'avatarUrl': this.ruleForm.avatarUrl
+          }
+          ).then((response) => {
+            if (response.status === 200) {
+              this.$router.push('/login')
+            } else if (response.status === 409) {
+              this.$message('Username existed!')
+            } else {
+              this.$message('Register Error!')
+            }
+          })
         } else {
-          console.log('error submit!!')
+          this.$message('Reigster Error!')
           return false
         }
       })
