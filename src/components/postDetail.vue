@@ -39,7 +39,7 @@
             <div class="reply-info">
               <div tabindex="0"
                    contenteditable="true"
-                   id="replyInput"
+                   id="commentInput"
                    spellcheck="false"
                    placeholder="输入评论..."
                    class="reply-input"
@@ -63,7 +63,8 @@
                        :src="item.avatarUrl"></el-avatar>
             <div class="author-info">
               <span class="author-name">{{item.username}}</span>
-              <span class="author-time">{{$moment(item.createTime).format('YYYY-MM-DD HH:mm')}}</span>
+              <span class="author-time">
+                {{item.createTime != '刚刚'?$moment(item.createTime).format('YYYY-MM-DD HH:mm'):'刚刚'}}</span>
             </div>
             <div class="icon-btn">
               <span @click="showReplyInput(i,item.username,item.commentId)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
@@ -71,7 +72,8 @@
             </div>
             <div class="talk-box">
               <p>
-                <span class="reply">{{item.content}}</span>
+                <span v-html="item.content"
+                      class="reply">{{item.content}}</span>
               </p>
             </div>
             <div class="reply-box">
@@ -116,7 +118,7 @@
               <div class=" reply-btn-box">
                 <el-button class="reply-btn"
                            size="medium"
-                           @click="sendCommentReply(i,j)"
+                           @click="sendCommentReply"
                            type="primary">发表评论</el-button>
               </div>
             </div>
@@ -176,49 +178,49 @@ export default {
     return {
       btnShow: false,
       index: '0',
-      replyComment: '',
+      commentInput: '',
       myName: 'Lana Del Rey',
       myId: 19870621,
       to: '',
       toId: -1,
       comments: [
-        {
-          username: 'Lana Del Rey',
-          commentId: 19870621,
-          avatarUrl: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
-          content: '我发布一张新专辑Norman Fucking Rockwell,大家快来听啊',
-          createTime: '2019年9月16日 18:43',
-          replyNum: 2,
-          likeNum: 15,
-          inputShow: false
-          // reply: [
-          //   {
-          //     from: 'Taylor Swift',
-          //     fromId: 19891221,
-          //     fromHeadImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
-          //     to: 'Lana Del Rey',
-          //     toId: 19870621,
-          //     comment: '我很喜欢你的新专辑！！',
-          //     time: '2019年9月16日 18:43',
-          //     commentNum: 1,
-          //     like: 15,
-          //     inputShow: false
-          //   },
-          //   {
-          //     from: 'Ariana Grande',
-          //     fromId: 1123,
-          //     fromHeadImg: 'https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg',
-          //     to: 'Lana Del Rey',
-          //     toId: 19870621,
-          //     comment: '别忘记宣传我们的合作单曲啊',
-          //     time: '2019年9月16日 18:43',
-          //     commentNum: 0,
-          //     like: 5,
-          //     inputShow: false
+        // {
+        //   username: 'Lana Del Rey',
+        //   commentId: 19870621,
+        //   avatarUrl: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
+        //   content: '我发布一张新专辑Norman Fucking Rockwell,大家快来听啊',
+        //   createTime: '2019年9月16日 18:43',
+        //   replyNum: 2,
+        //   likeNum: 15,
+        //   inputShow: false
+        //   // reply: [
+        //   //   {
+        //   //     from: 'Taylor Swift',
+        //   //     fromId: 19891221,
+        //   //     fromHeadImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
+        //   //     to: 'Lana Del Rey',
+        //   //     toId: 19870621,
+        //   //     comment: '我很喜欢你的新专辑！！',
+        //   //     time: '2019年9月16日 18:43',
+        //   //     commentNum: 1,
+        //   //     like: 15,
+        //   //     inputShow: false
+        //   //   },
+        //   //   {
+        //   //     from: 'Ariana Grande',
+        //   //     fromId: 1123,
+        //   //     fromHeadImg: 'https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg',
+        //   //     to: 'Lana Del Rey',
+        //   //     toId: 19870621,
+        //   //     comment: '别忘记宣传我们的合作单曲啊',
+        //   //     time: '2019年9月16日 18:43',
+        //   //     commentNum: 0,
+        //   //     like: 5,
+        //   //     inputShow: false
 
-          //   }
-          // ]
-        }
+        //   //   }
+        //   // ]
+        // }
       ],
       postId: '',
       postData: {},
@@ -232,16 +234,16 @@ export default {
         pageSize: 2
       },
       authorInfo: {
-        username: 'HPY',
+        username: 'hpy',
         email: 'EMAIL',
         likeNum: 10000000,
         avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443788&di=95bd4d1f71ad1d8604bd3b190b15b3c5&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201902%2F19%2F20190219130018_wwfpe.jpg'
       },
       userInfo: {
-        username: 'JJN',
+        username: 'jj',
         email: 'EMAIL',
         likeNum: 100,
-        avatar: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg'
+        avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443792&di=a59189a577729463ee4c42ccada26eb0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201802%2F27%2F20180227201208_ujwhc.jpeg'
 
       },
       commentFold: true
@@ -269,10 +271,10 @@ export default {
   },
   methods: {
     inputFocus () {
-      var replyInput = document.getElementById('replyInput')
-      replyInput.style.padding = '8px 8px'
-      replyInput.style.border = '2px solid blue'
-      replyInput.focus()
+      var commentInput = document.getElementById('commentInput')
+      commentInput.style.padding = '8px 8px'
+      commentInput.style.border = '2px solid blue'
+      commentInput.focus()
     },
     showReplyBtn () {
       this.btnShow = true
@@ -293,53 +295,61 @@ export default {
       return this.comments[i].inputShow
     },
     sendComment () {
-      if (!this.replyComment) {
+      if (!this.commentInput) {
         this.$message({
           showClose: true,
           type: 'warning',
           message: '评论不能为空'
         })
       } else {
-        let a = {}
-        let input = document.getElementById('replyInput')
-        let timeNow = new Date().getTime()
-        let time = this.dateStr(timeNow)
-        a.name = this.myName
-        a.comment = this.replyComment
-        a.headImg = this.userInfo.avatar
-        a.time = time
-        a.commentNum = 0
-        a.like = 0
-        this.comments.push(a)
-        this.replyComment = ''
+        let newComment = {}
+        newComment.username = this.userInfo.username
+        newComment.avatarUrl = this.userInfo.avatar
+        newComment.createTime = '刚刚'
+        newComment.replyNum = 1
+        newComment.likeNum = 1
+        newComment.content = this.commentInput
+        this.$axios.post('/boot/comment/publish', {
+          postId: this.postData.postId,
+          username: this.userInfo.username,
+          content: this.commentInput
+        }).then(response => {
+          console.log(response.data)
+          if (response.data) {
+            this.comments.unshift(newComment)
+          }
+        })
+        // let a = {}
+        let input = document.getElementById('commentInput')
+        // let timeNow = new Date().getTime()
+        // let time = this.dateStr(timeNow)
+        // a.name = this.myName
+        // a.comment = this.commentInput
+        // a.headImg = this.userInfo.avatar
+        // a.time = time
+        // a.commentNum = 0
+        // a.like = 0
+        // this.comments.push(a)
+        this.commentInput = ''
         input.innerHTML = ''
       }
     },
-    sendCommentReply (i, j) {
-      if (!this.replyComment) {
+    sendCommentReply () {
+      if (!this.commentInput) {
         this.$message({
           showClose: true,
           type: 'warning',
           message: '评论不能为空'
         })
       } else {
-        let a = {}
-        let timeNow = new Date().getTime()
-        let time = this.dateStr(timeNow)
-        a.from = this.myName
-        a.to = this.to
-        a.fromHeadImg = this.userInfo.avatar
-        a.comment = this.replyComment
-        a.time = time
-        a.commentNum = 0
-        a.like = 0
-        this.comments[i].reply.push(a)
-        this.replyComment = ''
-        document.getElementsByClassName('reply-comment-input')[i].innerHTML = ''
+        // this.comments[i].reply.push(a)
+        this.commentInput = ''
+        // document.getElementsByClassName('reply-comment-input')[i].innerHTML = ''
       }
     },
     onDivInput: function (e) {
-      this.replyComment = e.target.innerHTML
+      this.commentInput = e.target.innerHTML
+      console.log('comment input:' + this.commentInput)
     },
     dateStr (date) {
       // 获取js 时间戳
@@ -421,7 +431,9 @@ export default {
         .get('/boot/comment/get-comments-of-post/' + this.postData.postId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
         .then(response => {
           console.log(response.data)
-          this.comments = response.data.list
+          for (var item of response.data.list) {
+            this.comments.push(item)
+          }
           this.commentInfo.currentPage = response.data.pageNum
           this.commentInfo.hasNextPage = response.data.hasNextPage
           this.commentInfo.pageNum = response.data.size
