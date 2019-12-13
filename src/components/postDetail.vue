@@ -67,7 +67,7 @@
                 {{item.createTime != '刚刚'?$moment(item.createTime).format('YYYY-MM-DD HH:mm'):'刚刚'}}</span>
             </div>
             <div class="icon-btn">
-              <span @click="showReplyInput(i,item.username,item.commentId)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
+              <span @click="showReplyInput(i)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
               <i class="iconfont el-icon-caret-top"></i>{{item.likeNum}}
             </div>
             <div class="talk-box">
@@ -77,28 +77,26 @@
               </p>
             </div>
             <div class="reply-box">
-              <div v-for="(reply,j) in item.reply"
+              <div v-for="(reply,j) in item.replies"
                    :key="j"
                    class="author-title">
                 <el-avatar class="header-img"
                            :size="40"
-                           :src="reply.fromHeadImg"></el-avatar>
+                           :src="reply.avatarUrl"></el-avatar>
                 <div class="author-info">
-                  <span class="author-name">{{reply.from}}</span>
-                  <span class="author-time">{{reply.time}}</span>
+                  <span class="author-name">{{reply.username}}</span>
+                  <span class="author-time">{{reply.createTime}}</span>
                 </div>
                 <div class="icon-btn">
-                  <span @click="showReplyInput(i,reply.from,reply.id)"><i class="iconfont el-icon-s-comment"></i>{{reply.commentNum}}</span>
-                  <i class="iconfont el-icon-caret-top"></i>{{reply.like}}
+                  <!-- reply不需要点赞与回复 -->
                 </div>
                 <div class="talk-box">
                   <p>
-                    <span>回复 {{reply.to}}:</span>
-                    <span class="reply">{{reply.comment}}</span>
+                    <span>回复 {{item.username}}:</span>
+                    <span class="reply">{{reply.content}}</span>
                   </p>
                 </div>
                 <div class="reply-box">
-
                 </div>
               </div>
             </div>
@@ -109,17 +107,18 @@
                          :src="userInfo.avatar"></el-avatar>
               <div class="reply-info">
                 <div tabindex="0"
+                     id="replyInput"
                      contenteditable="true"
                      spellcheck="false"
-                     placeholder="输入评论..."
-                     @input="onDivInput($event)"
+                     placeholder="输入回复..."
+                     @input="onReplyInput($event)"
                      class="reply-input reply-comment-input"></div>
               </div>
               <div class=" reply-btn-box">
                 <el-button class="reply-btn"
                            size="medium"
-                           @click="sendCommentReply"
-                           type="primary">发表评论</el-button>
+                           @click="sendCommentReply(i)"
+                           type="primary">发表回复</el-button>
               </div>
             </div>
           </div>
@@ -179,6 +178,7 @@ export default {
       btnShow: false,
       index: '0',
       commentInput: '',
+      replyInput: '',
       myName: 'Lana Del Rey',
       myId: 19870621,
       to: '',
@@ -281,15 +281,17 @@ export default {
     },
     hideReplyBtn () {
       this.btnShow = false
-      document.getElementById('replyInput').style.padding = '10px'
-      document.getElementById('replyInput').style.border = 'none'
+      document.getElementById('commentInput').style.padding = '10px'
+      document.getElementById('commentInput').style.border = 'none'
     },
-    showReplyInput (i, name, id) {
+    showReplyInput (i) {
       this.comments[this.index].inputShow = false
       this.index = i
-      this.comments[i].inputShow = true
-      this.to = name
-      this.toId = id
+      // this.comments[i].inputShow = true
+      this.$set(this.comments[i], 'inputShow', true)
+      this.$forceUpdate()
+      // this.to = name
+      // this.toId = id
     },
     _inputShow (i) {
       return this.comments[i].inputShow
@@ -309,6 +311,7 @@ export default {
         newComment.replyNum = 1
         newComment.likeNum = 1
         newComment.content = this.commentInput
+        newComment.inputShow = false
         this.$axios.post('/boot/comment/publish', {
           postId: this.postData.postId,
           username: this.userInfo.username,
@@ -319,37 +322,47 @@ export default {
             this.comments.unshift(newComment)
           }
         })
-        // let a = {}
         let input = document.getElementById('commentInput')
-        // let timeNow = new Date().getTime()
-        // let time = this.dateStr(timeNow)
-        // a.name = this.myName
-        // a.comment = this.commentInput
-        // a.headImg = this.userInfo.avatar
-        // a.time = time
-        // a.commentNum = 0
-        // a.like = 0
-        // this.comments.push(a)
         this.commentInput = ''
         input.innerHTML = ''
       }
     },
-    sendCommentReply () {
-      if (!this.commentInput) {
+    sendCommentReply (i) {
+      if (!this.replyInput) {
         this.$message({
           showClose: true,
           type: 'warning',
-          message: '评论不能为空'
+          message: '回复不能为空'
         })
       } else {
         // this.comments[i].reply.push(a)
-        this.commentInput = ''
+        let newReply = {}
+        newReply.username = this.userInfo.username
+        newReply.avatarUrl = this.userInfo.avatar
+        newReply.createTime = '刚刚'
+        newReply.content = this.replyInput
+        this.$axios.post('/boot/reply/publish', {
+          username: this.userInfo.username,
+          commentId: this.comments[i].commentId,
+          content: this.replyInput
+        }).then(response => {
+          if (response.data) {
+            this.comments[i].replies.unshift(newReply)
+          }
+        })
+        let input = document.getElementById('replyInput')
+        this.replyInput = ''
+        input.innerHTML = ''
         // document.getElementsByClassName('reply-comment-input')[i].innerHTML = ''
       }
     },
     onDivInput: function (e) {
       this.commentInput = e.target.innerHTML
       console.log('comment input:' + this.commentInput)
+    },
+    onReplyInput: function (e) {
+      this.replyInput = e.target.innerHTML
+      console.log('reply input:' + this.replyInput)
     },
     dateStr (date) {
       // 获取js 时间戳
@@ -432,6 +445,7 @@ export default {
         .then(response => {
           console.log(response.data)
           for (var item of response.data.list) {
+            item.replies = []
             this.comments.push(item)
           }
           this.commentInfo.currentPage = response.data.pageNum
