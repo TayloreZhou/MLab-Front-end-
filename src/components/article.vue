@@ -7,7 +7,7 @@
     </el-row>
     <h4>发帖</h4>
     <el-row>
-      <el-col span="12" offset="6">
+      <el-col span=12 offset=6>
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="内容">
             <el-input type="textarea" v-model="form.desc"></el-input>

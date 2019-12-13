@@ -1,37 +1,44 @@
 <template>
-    <el-container class="wrap">
-      <el-header class="header" height="120px">
-        <div class="logo"></div>
-        <el-breadcrumb separator="/" class="nav">
-          <el-breadcrumb-item :to="{ path: '/' }">最热</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">最新</a></el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">节点</a></el-breadcrumb-item>
-          <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
-        </el-breadcrumb>
-      </el-header>
-      <el-main class="main">
-          <el-card shadow="always" class="post">
-            <div slot="header" class="clearfix">
-                <div class="container">
-                    <img class="avatar fr" v-bind:src="postContent.member.avatar_mini" alt="avatar">
-                    <el-button size="mini" round> #{{ postContent.node.title }}</el-button>
-                    <h1 class="post-title">{{ postContent.title }}</h1>
-                    <small class="post-author">{{postContent.member.username}}   ● 最后回复 ● {{postContent.last_reply_by}}</small>
-                </div>
-            </div>
-            <div class="content clearfix">
-                <div class="post-content" v-html="postContent.content_rendered"></div>
-            </div>
-          </el-card>
-          <ul>
-            <replie class="replie" v-for="replie in postReplies" :key="replie.id" :replie="replie" v-loading="loading"></replie>
-          </ul>
-      </el-main>
-      <el-footer class="footer">
-        <div class="copyright"><a href="https://github.com/hsingyin">@hsingyin </a></div>
-        <small class="slogan">♥ Do have faith in what you're doing.</small>
-      </el-footer>
-    </el-container>
+  <el-container class="wrap">
+    <el-header class="header"
+               height="120px">
+      <el-card>
+        POST
+      </el-card>
+    </el-header>
+    <el-main class="main">
+      <el-card shadow="always"
+               class="post">
+        <div slot="header"
+             class="clearfix">
+          <div class="container">
+            <img class="avatar fr"
+                 v-bind:src="postContent.member.avatar_mini"
+                 alt="avatar">
+            <el-button size="mini"
+                       round> #{{ postContent.node.title }}</el-button>
+            <h1 class="post-title">{{ postContent.title }}</h1>
+            <small class="post-author">{{postContent.member.username}} ● 最后回复 ● {{postContent.last_reply_by}}</small>
+          </div>
+        </div>
+        <div class="content clearfix">
+          <div class="post-content"
+               v-html="postContent.content_rendered"></div>
+        </div>
+      </el-card>
+      <ul>
+        <replie class="replie"
+                v-for="replie in postReplies"
+                :key="replie.id"
+                :replie="replie"
+                v-loading="loading"></replie>
+      </ul>
+    </el-main>
+    <el-footer class="footer">
+      <div class="copyright"><a href="https://github.com/hsingyin">@hsingyin </a></div>
+      <small class="slogan">♥ Do have faith in what you're doing.</small>
+    </el-footer>
+  </el-container>
 </template>
 <script>
 import Replies from '@/components/Replies'
@@ -53,7 +60,7 @@ export default {
   },
   methods: {
     handlePostContent (id) {
-    // 获取对应主题下的信息
+      // 获取对应主题下的信息
       this.$axios.get('/api/topics/show.json', {
         params: {
           id: id
@@ -68,7 +75,7 @@ export default {
         })
     },
     handlePostReplies (id) {
-    // 获取回复
+      // 获取回复
       this.$axios.get('/api/replies/show.json', {
         params: {
           topic_id: id
@@ -88,7 +95,8 @@ export default {
 </script>
 
 <style scoped>
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {
@@ -104,7 +112,7 @@ a {
   text-decoration: none;
 }
 .fr {
-    float: right;
+  float: right;
 }
 .wrap {
   width: 1000px;
@@ -113,10 +121,10 @@ a {
 }
 .main {
   width: 1000px;
-
 }
 .header {
-  position: relative;
+  position: initial;
+  margin-top: 10%;
 }
 .logo {
   width: 94px;
@@ -124,7 +132,7 @@ a {
   position: absolute;
   top: 25px;
   left: 100px;
-  background: url('../assets/images/v2ex.png') no-repeat;
+  background: url("../assets/images/v2ex.png") no-repeat;
   background-size: 94px 30px;
 }
 .nav {
@@ -140,29 +148,29 @@ a {
   margin-bottom: 8px;
 }
 .post-title {
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 150%;
-    margin: 10px 0px 10px 0px;
-    padding: 0px;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 150%;
+  margin: 10px 0px 10px 0px;
+  padding: 0px;
 }
 .avatar {
-    width: 70px;
-    height: 70px;
-    -moz-border-radius: 4px;
-    border-radius: 4px
+  width: 70px;
+  height: 70px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
 }
 .post-author {
-    color: gray;
+  color: gray;
 }
 .post-content {
-    padding: 10px;
+  padding: 10px;
 }
 .replie {
-    width: 800px;
-    height: auto;
-    margin: 0 auto;
-    margin-bottom: 8px;
+  width: 800px;
+  height: auto;
+  margin: 0 auto;
+  margin-bottom: 8px;
 }
 .footer {
   position: relative;

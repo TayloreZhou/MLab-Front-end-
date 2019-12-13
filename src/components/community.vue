@@ -1,71 +1,128 @@
 <template>
-    <el-container class="wrap">
-      <el-divider content-position="right">My lab, machine lab.</el-divider>
-      <el-header class="header" height="80px">
-        <el-row>
-          <el-col span="5">
-            <el-breadcrumb separator="/" class="nav">
-              <el-breadcrumb-item><a @click="getHotList">最热</a></el-breadcrumb-item>
-              <el-breadcrumb-item><a @click="getLatestList">最新</a></el-breadcrumb-item>
-              <el-breadcrumb-item><a href="/nodes">节点</a></el-breadcrumb-item>
-              <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
-            </el-breadcrumb>
-          </el-col>
-          <el-col span="2" offset="17">
-            <el-link href="/society/write">我要发帖</el-link>
-          </el-col>
-        </el-row>
-      </el-header>
-      <el-main class="main" v-loading="loading">
-        <ul>
-          <post v-for=" postData in posts" :key="postData.id" :postData="postData"></post>
-        </ul>
-      </el-main>
-      <el-divider content-position="left">My lab, machine lab.</el-divider>
+  <div>
+    <el-divider content-position="right">My lab, machine lab.</el-divider>
+    <el-container>
+      <el-container class="wrap">
+        <el-header class="header"
+                   height="10px">
+          <el-row>
+            <el-col :span=4
+                    :offset=1>
+              <el-radio-group v-model="radioOrder"
+                              @change="handleRadioChange">
+                <el-radio-button label="latest">latest</el-radio-button>
+                <el-radio-button label="hot">hot</el-radio-button>
+              </el-radio-group>
+            </el-col>
+            <el-col :span=4
+                    :offset=15>
+              <el-button type="primary"
+                         @click="gotoLink">Create Post!</el-button>
+              <!-- <el-link href="/society/write">我要发帖</el-link> -->
+            </el-col>
+          </el-row>
+        </el-header>
+        <el-main class="main"
+                 v-loading="loading">
+          <ul>
+            <post v-for=" postData in posts"
+                  :key="postData.post_id"
+                  :postData="postData"></post>
+          </ul>
+          <el-pagination :key="pageshow"
+                         @current-change="handleCurrentChange"
+                         :page-size="pageSize"
+                         :page-count="pages"
+                         :current-page.sync="currentPage"></el-pagination>
+        </el-main>
+      </el-container>
+      <el-aside class="usercard">
+        <el-card>
+          <div slot="header">
+            <el-avatar :size="150"
+                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+          </div>
+          <div>
+            <a>username</a></div>
+          <div>
+            <a>email</a></div>
+          <div><a>like_num</a></div>
+        </el-card>
+      </el-aside>
     </el-container>
+  </div>
 </template>
 
 <script>
-import Post from '@/components/Post'
+import Post from '@/components/Post.vue'
 
 export default {
   name: 'home',
   components: {
-    'post': Post
+    post: Post
   },
   data () {
     return {
       msg: '主页',
       posts: {},
-      loading: true
+      loading: true,
+      radioOrder: 'hot',
+      pageSize: 10,
+      pages: 1,
+      currentPage: 1,
+      pageshow: true
     }
   },
   created: function () {
-    // 默认获取最火信息
-    this.getHotList()
+    // 默认获取最热信息
+    this.getList(1)
   },
   methods: {
-    getHotList () {
-    // 获取热门主题下的信息
-      this.$axios.get('/api/topics/hot.json')
-        .then((response) => {
+    handleRadioChange () {
+      this.currentPage = 1
+      this.getList(1)
+      this.pageshow = false
+      this.$nextTick(() => {
+        this.pageshow = true
+      })
+    },
+    getList (pageNum) {
+      if (this.radioOrder === 'hot') {
+        this.getHotList(pageNum)
+      } else if (this.radioOrder === 'latest') {
+        this.getLatestList(pageNum)
+      }
+      console.log('get' + this.curretPage)
+    },
+    getHotList (pageNum) {
+      // 获取热门主题下的信息
+      this.$axios
+        .get('/boot/post/get-order-by-like?page-num=' + pageNum + '&&page-size=' + this.pageSize)
+        .then(response => {
+          console.log('hot list\n')
           console.log(response.data)
-          this.posts = response.data
+          this.posts = response.data.list
           this.loading = false
+          this.pages = response.data.pages
+          this.currentPage = response.data.pageNum
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error)
         })
     },
-    getLatestList () {
-    // 获取最新主题下的信息
-      this.$axios.get('/api/topics/latest.json')
-        .then((response) => {
+    getLatestList (pageNum) {
+      // 获取最新主题下的信息
+      this.$axios
+        .get('/boot/post/get-order-by-time?page-num=' + pageNum + '&&page-size=' + this.pageSize)
+        .then(response => {
+          console.log('latest list\n')
           console.log(response.data)
-          this.posts = response.data
+          this.posts = response.data.list
           this.loading = false
+          this.pages = response.data.pages
+          this.currentPage = response.data.pageNum
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error)
         })
     },
@@ -79,6 +136,13 @@ export default {
       console.log('传入的url' + url)
       let newURL = url.replace('/mini/g', 'large')
       console.log('新的url' + newURL)
+    },
+    gotoLink () {
+      this.$router.push('/society/write')
+    },
+    handleCurrentChange (val) {
+      console.log('handle' + this.currentPage)
+      this.getList(val)
     }
   }
 }
@@ -86,7 +150,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {
@@ -107,7 +172,8 @@ a {
   height: auto;
 }
 .main {
-  width: 1000px;
+  width: auto;
+  margin-top: 30px;
   min-height: 500px;
 }
 .header {
@@ -121,7 +187,7 @@ a {
   position: absolute;
   top: 25px;
   left: 100px;
-  background: url('../assets/images/v2ex.png') no-repeat;
+  background: url("../assets/images/v2ex.png") no-repeat;
   background-size: 94px 30px;
 }
 .nav {
@@ -142,5 +208,8 @@ a {
   left: 100px;
   top: 30px;
   color: gray;
+}
+.usercard {
+  margin-top: 50px;
 }
 </style>
