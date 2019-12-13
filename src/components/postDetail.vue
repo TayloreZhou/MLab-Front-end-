@@ -10,8 +10,8 @@
                  style="height:20px">
               <el-avatar class="avatar"
                          fit="fill"
-                         :src="authorInfo.avatar"></el-avatar>
-              <a class="author">{{authorInfo.username}}</a>
+                         :src="myHeader"></el-avatar>
+              <a class="author">{{postData.username}}</a>
             </div>
             <div class="post-detail">
               <a class="post-title">{{postData.title}}</a>
@@ -35,7 +35,7 @@
                class="my-reply">
             <el-avatar class="header-img"
                        :size="40"
-                       :src="userInfo.avatar"></el-avatar>
+                       :src="myHeader"></el-avatar>
             <div class="reply-info">
               <div tabindex="0"
                    contenteditable="true"
@@ -104,7 +104,7 @@
                  class="my-reply my-comment-reply">
               <el-avatar class="header-img"
                          :size="40"
-                         :src="userInfo.avator"></el-avatar>
+                         :src="myHeader"></el-avatar>
               <div class="reply-info">
                 <div tabindex="0"
                      contenteditable="true"
@@ -127,13 +127,13 @@
         <el-card>
           <div slot="header">
             <el-avatar :size="150"
-                       :src="authorInfo.avatar"></el-avatar>
+                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
           </div>
           <div>
-            <a>author: {{authorInfo.username}}</a></div>
+            <a>username</a></div>
           <div>
-            <a>{{authorInfo.email}}</a></div>
-          <div><a>{{authorInfo.likeNum}} like</a></div>
+            <a>email</a></div>
+          <div><a>like_num</a></div>
         </el-card>
       </el-aside>
     </el-container>
@@ -166,13 +166,14 @@ const clickoutside = {
   }
 }
 export default {
-  name: 'postDetail',
+  name: 'ArticleComment',
   data () {
     return {
       btnShow: false,
       index: '0',
       replyComment: '',
       myName: 'Lana Del Rey',
+      myHeader: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
       myId: 19870621,
       to: '',
       toId: -1,
@@ -256,20 +257,6 @@ export default {
       likeIcon: 'el-icon-star-off',
       likeType: 'primary',
       author: '',
-      authorInfo: {
-        username: 'HPY',
-        email: 'EMAIL',
-        likeNum: 10000000,
-        avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
-
-      },
-      userInfo: {
-        username: 'JJN',
-        email: 'EMAIL',
-        likeNum: 100,
-        avatar: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg'
-
-      },
       postLikeNum: 0
     }
   },
@@ -285,7 +272,6 @@ export default {
         this.postData = response.data
         this.postLikeNum = response.data.likeNum
         this.author = response.data.username
-        this.authorInfo.username = this.author
         this.checkPostLike()
       })
       .catch(error => {
@@ -331,7 +317,7 @@ export default {
         let time = this.dateStr(timeNow)
         a.name = this.myName
         a.comment = this.replyComment
-        a.headImg = this.userInfo.avator
+        a.headImg = this.myHeader
         a.time = time
         a.commentNum = 0
         a.like = 0
@@ -353,7 +339,7 @@ export default {
         let time = this.dateStr(timeNow)
         a.from = this.myName
         a.to = this.to
-        a.fromHeadImg = this.userInfo.avator
+        a.fromHeadImg = this.myHeader
         a.comment = this.replyComment
         a.time = time
         a.commentNum = 0
