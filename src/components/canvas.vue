@@ -1,7 +1,8 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <el-divider></el-divider>
     <div id="PaletteAndDiagram">
+      <div class="tabber" @click="goBack"><i class="el-icon-back"/></div>
       <div id="sideBar">
         <div id="accordion">
           <h4 @click="showPaletteLevel1">Input Layer</h4>
@@ -33,7 +34,7 @@
       <div id="myDiagramDiv"></div>
       <div id="infoBar" class="inspector"></div>
       <div id="subbmitButton">
-        <el-button @click="commit" type="primary" round>提交</el-button>
+        <el-button @click="commit" type="primary" round>commit</el-button>
       </div>
       <div style="position: fixed; right: 100px; top: 200px">
         <el-button @click="myModel" ></el-button>
@@ -55,7 +56,8 @@ export default {
       stateP1: 0,
       stateP2: 0,
       stateP3: 0,
-      myDiagram: null
+      myDiagram: null,
+      loading: false
     }
   },
   mounted () {
@@ -296,9 +298,7 @@ export default {
         console.log(e.subject.part)
       })
 
-      mySelf.myDiagram.addDiagramListener('BackgroundSingleClicked', function (
-        e
-      ) {
+      mySelf.myDiagram.addDiagramListener('BackgroundSingleClicked', function (e) {
         debugger
         console.log('Double-clicked at' + e.diagram.lastInput.documentPoint)
       })
@@ -503,11 +503,12 @@ export default {
       }
     },
     myModel () {
+      console.log(this.myDiagram.model.toJSON())
       if (typeof WebSocket === 'undefined') {
         console.log('您的浏览器不支持WebSocket')
       } else {
         console.log('您的浏览器支持WebSocket')
-        var socketUrl = 'http://localhost:8080/api/websocket/1001'
+        var socketUrl = 'http://localhost:8087/api/websocket/1001'
         socketUrl = socketUrl.replace('https', 'ws').replace('http', 'ws')
         console.log(socketUrl)
         var socket = new WebSocket(socketUrl)
@@ -525,6 +526,28 @@ export default {
           console.log('websocket发生了错误')
         }
       }
+    },
+    commit () {
+      console.log('OK')
+      this.loading = true
+      this.$axios({
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        url: '/boot/api/model/generate/123/912?description=221',
+        data: this.myDiagram.model.toJSON()
+      }).then(response => {
+        this.loading = false
+        this.$message({
+          message: '模型成功生成',
+          type: 'success'
+        })
+        this.$router.push({
+          path: '/modellist'
+        })
+      })
+    },
+    goBack () {
+      this.$router.go(-1)
     }
   }
 }
@@ -601,5 +624,9 @@ figure {
 .inspector {
   background: white;
   color: black;
+}
+.tabber {
+  font-size: 24px;
+  text-align: left;
 }
 </style>

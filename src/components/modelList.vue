@@ -33,8 +33,6 @@
           <el-card class="box-card" shadow="hover">
             <div slot="header" class="clearfix">
               <span style="line-height: 28px;">{{modelName}}</span>
-              <el-button style="float: right; padding: 5px" type="primary" size="mini">training</el-button>
-              <el-button style="float: right; padding: 5px" type="success" size="mini">edit</el-button>
             </div>
             <div class="text item">
               create time：
@@ -48,9 +46,23 @@
             <div class="text item">
               status：
             </div>
+            <div>
+              <el-divider></el-divider>
+              <el-button @click="trainModel" style="padding: 5px" type="primary" size="mini">train</el-button>
+               <el-button @click="editModel" style="padding: 5px" type="success" size="mini">edit</el-button>
+              <el-button @click="deleteModel" style="padding: 5px" type="danger" size="mini">delete</el-button>
+            </div>
           </el-card>
         </div></el-col>
     </el-row>
+      <el-pagination
+        @current-change="handleCurrentChange"
+        :hide-on-single-page=false
+        :current-page.sync="currentPage"
+        :page-size="6"
+        layout="prev, pager, next, jumper"
+        :total="48">
+      </el-pagination>
     </el-main>
     </el-container>
   </el-container>
@@ -86,7 +98,22 @@ export default {
         name: '王小虎',
         description: '上海市普陀区金沙江路 1518 弄'
       }],
-      modelName: 'abc'
+      modelName: 'abc',
+      currentPage: 1
+    }
+  },
+  methods: {
+    editModel () {
+      this.$router.push({
+        path: '/canvas'
+      })
+    },
+    trainModel () {
+    },
+    deleteModel () {
+    },
+    handleCurrentChange (val) {
+      console.log(val)
     }
   }
 }
@@ -96,12 +123,12 @@ export default {
 .text {
   font-size: 12px;
   text-align: left;
+  color: #606266;
 }
 
 .item {
   padding: 10px 0;
-  float: left;
-  width: 60%;
+  width: 100%;
 }
 
 .clearfix:before,
