@@ -13,6 +13,7 @@ import article from '../components/article'
 import uploader from '../components/uploader'
 import uploaderBoot from '../components/upload_boot/uploaderBoot'
 import testSideBar from '../components/testComponet/testSideBar'
+import modelList from '../components/modelList'
 
 Vue.use(Router)
 
@@ -53,6 +54,11 @@ export default new Router({
           path: '/canvas',
           name: 'canvas',
           component: canvas
+        },
+        {
+          path: '/modellist',
+          name: 'modelList',
+          component: modelList
         },
         {
           path: '/joblist',
