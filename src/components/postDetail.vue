@@ -10,8 +10,8 @@
                  style="height:20px">
               <el-avatar class="avatar"
                          fit="fill"
-                         :src="myHeader"></el-avatar>
-              <a class="author">{{postData.username}}</a>
+                         :src="authorInfo.avatar"></el-avatar>
+              <a class="author">{{authorInfo.username}}</a>
             </div>
             <div class="post-detail">
               <a class="post-title">{{postData.title}}</a>
@@ -35,7 +35,7 @@
                class="my-reply">
             <el-avatar class="header-img"
                        :size="40"
-                       :src="myHeader"></el-avatar>
+                       :src="userInfo.avatar"></el-avatar>
             <div class="reply-info">
               <div tabindex="0"
                    contenteditable="true"
@@ -60,18 +60,18 @@
                class="author-title reply-father">
             <el-avatar class="header-img"
                        :size="40"
-                       :src="item.headImg"></el-avatar>
+                       :src="item.avatarUrl"></el-avatar>
             <div class="author-info">
-              <span class="author-name">{{item.name}}</span>
-              <span class="author-time">{{item.time}}</span>
+              <span class="author-name">{{item.username}}</span>
+              <span class="author-time">{{$moment(item.createTime).format('YYYY-MM-DD HH:mm')}}</span>
             </div>
             <div class="icon-btn">
-              <span @click="showReplyInput(i,item.name,item.id)"><i class="iconfont el-icon-s-comment"></i>{{item.commentNum}}</span>
-              <i class="iconfont el-icon-caret-top"></i>{{item.like}}
+              <span @click="showReplyInput(i,item.username,item.commentId)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
+              <i class="iconfont el-icon-caret-top"></i>{{item.likeNum}}
             </div>
             <div class="talk-box">
               <p>
-                <span class="reply">{{item.comment}}</span>
+                <span class="reply">{{item.content}}</span>
               </p>
             </div>
             <div class="reply-box">
@@ -104,7 +104,7 @@
                  class="my-reply my-comment-reply">
               <el-avatar class="header-img"
                          :size="40"
-                         :src="myHeader"></el-avatar>
+                         :src="userInfo.avatar"></el-avatar>
               <div class="reply-info">
                 <div tabindex="0"
                      contenteditable="true"
@@ -121,19 +121,24 @@
               </div>
             </div>
           </div>
+          <div v-if="postData.commentNum > 2"
+               v-on:click="changeCommentFold">
+            <el-link type="primary"
+                     :disabled="!commentInfo.hasNextPage">{{commentInfo.hasNextPage?'展开更多评论 ↓':'没有更多评论了'}}</el-link>
+          </div>
         </el-main>
       </el-container>
       <el-aside class="usercard">
         <el-card>
           <div slot="header">
             <el-avatar :size="150"
-                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                       :src="authorInfo.avatar"></el-avatar>
           </div>
           <div>
-            <a>username</a></div>
+            <a>author: {{authorInfo.username}}</a></div>
           <div>
-            <a>email</a></div>
-          <div><a>like_num</a></div>
+            <a>{{authorInfo.email}}</a></div>
+          <div><a>{{authorInfo.likeNum}} like</a></div>
         </el-card>
       </el-aside>
     </el-container>
@@ -166,90 +171,53 @@ const clickoutside = {
   }
 }
 export default {
-  name: 'ArticleComment',
+  name: 'postDetail',
   data () {
     return {
       btnShow: false,
       index: '0',
       replyComment: '',
       myName: 'Lana Del Rey',
-      myHeader: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
       myId: 19870621,
       to: '',
       toId: -1,
       comments: [
         {
-          name: 'Lana Del Rey',
-          id: 19870621,
-          headImg: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
-          comment: '我发布一张新专辑Norman Fucking Rockwell,大家快来听啊',
-          time: '2019年9月16日 18:43',
-          commentNum: 2,
-          like: 15,
-          inputShow: false,
-          reply: [
-            {
-              from: 'Taylor Swift',
-              fromId: 19891221,
-              fromHeadImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
-              to: 'Lana Del Rey',
-              toId: 19870621,
-              comment: '我很喜欢你的新专辑！！',
-              time: '2019年9月16日 18:43',
-              commentNum: 1,
-              like: 15,
-              inputShow: false
-            },
-            {
-              from: 'Ariana Grande',
-              fromId: 1123,
-              fromHeadImg: 'https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg',
-              to: 'Lana Del Rey',
-              toId: 19870621,
-              comment: '别忘记宣传我们的合作单曲啊',
-              time: '2019年9月16日 18:43',
-              commentNum: 0,
-              like: 5,
-              inputShow: false
+          username: 'Lana Del Rey',
+          commentId: 19870621,
+          avatarUrl: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
+          content: '我发布一张新专辑Norman Fucking Rockwell,大家快来听啊',
+          createTime: '2019年9月16日 18:43',
+          replyNum: 2,
+          likeNum: 15,
+          inputShow: false
+          // reply: [
+          //   {
+          //     from: 'Taylor Swift',
+          //     fromId: 19891221,
+          //     fromHeadImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
+          //     to: 'Lana Del Rey',
+          //     toId: 19870621,
+          //     comment: '我很喜欢你的新专辑！！',
+          //     time: '2019年9月16日 18:43',
+          //     commentNum: 1,
+          //     like: 15,
+          //     inputShow: false
+          //   },
+          //   {
+          //     from: 'Ariana Grande',
+          //     fromId: 1123,
+          //     fromHeadImg: 'https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg',
+          //     to: 'Lana Del Rey',
+          //     toId: 19870621,
+          //     comment: '别忘记宣传我们的合作单曲啊',
+          //     time: '2019年9月16日 18:43',
+          //     commentNum: 0,
+          //     like: 5,
+          //     inputShow: false
 
-            }
-          ]
-        },
-        {
-          name: 'Taylor Swift',
-          id: 19891221,
-          headImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
-          comment: '我发行了我的新专辑Lover',
-          time: '2019年9月16日 18:43',
-          commentNum: 1,
-          like: 5,
-          inputShow: false,
-          reply: [
-            {
-              from: 'Lana Del Rey',
-              fromId: 19870621,
-              fromHeadImg: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
-              to: 'Taylor Swift',
-              toId: 19891221,
-              comment: '新专辑和speak now 一样棒！',
-              time: '2019年9月16日 18:43',
-              commentNum: 25,
-              like: 5,
-              inputShow: false
-
-            }
-          ]
-        },
-        {
-          name: 'Norman Fucking Rockwell',
-          id: 20190830,
-          headImg: 'https://ae01.alicdn.com/kf/Hdd856ae4c81545d2b51fa0c209f7aa28Z.jpg',
-          comment: 'Plz buy Norman Fucking Rockwell on everywhere',
-          time: '2019年9月16日 18:43',
-          commentNum: 0,
-          like: 5,
-          inputShow: false,
-          reply: []
+          //   }
+          // ]
         }
       ],
       postId: '',
@@ -257,7 +225,26 @@ export default {
       likeIcon: 'el-icon-star-off',
       likeType: 'primary',
       author: '',
-      postLikeNum: 0
+      commentInfo: {
+        currentPage: 1,
+        hasNextPage: true,
+        pageNum: '',
+        pageSize: 2
+      },
+      authorInfo: {
+        username: 'HPY',
+        email: 'EMAIL',
+        likeNum: 10000000,
+        avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443788&di=95bd4d1f71ad1d8604bd3b190b15b3c5&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201902%2F19%2F20190219130018_wwfpe.jpg'
+      },
+      userInfo: {
+        username: 'JJN',
+        email: 'EMAIL',
+        likeNum: 100,
+        avatar: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg'
+
+      },
+      commentFold: true
     }
   },
   directives: { clickoutside },
@@ -272,7 +259,9 @@ export default {
         this.postData = response.data
         this.postLikeNum = response.data.likeNum
         this.author = response.data.username
+        this.authorInfo.username = this.author
         this.checkPostLike()
+        this.getComments(1, this.commentInfo.pageSize)
       })
       .catch(error => {
         console.log(error)
@@ -317,7 +306,7 @@ export default {
         let time = this.dateStr(timeNow)
         a.name = this.myName
         a.comment = this.replyComment
-        a.headImg = this.myHeader
+        a.headImg = this.userInfo.avatar
         a.time = time
         a.commentNum = 0
         a.like = 0
@@ -339,7 +328,7 @@ export default {
         let time = this.dateStr(timeNow)
         a.from = this.myName
         a.to = this.to
-        a.fromHeadImg = this.myHeader
+        a.fromHeadImg = this.userInfo.avatar
         a.comment = this.replyComment
         a.time = time
         a.commentNum = 0
@@ -426,6 +415,23 @@ export default {
         .catch(error => {
           console.log(error)
         })
+    },
+    getComments (pageNum, pageSize) {
+      this.$axios
+        .get('/boot/comment/get-comments-of-post/' + this.postData.postId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
+        .then(response => {
+          console.log(response.data)
+          this.comments = response.data.list
+          this.commentInfo.currentPage = response.data.pageNum
+          this.commentInfo.hasNextPage = response.data.hasNextPage
+          this.commentInfo.pageNum = response.data.size
+          console.log(this.comments)
+        })
+    },
+    changeCommentFold () {
+      if (this.commentInfo.hasNextPage) {
+        this.getComments(this.commentInfo.currentPage + 1, this.commentInfo.pageSize)
+      }
     }
 
   }
@@ -435,6 +441,7 @@ export default {
 .my-reply {
   padding: 10px;
   background-color: #fafbfc;
+  text-align: left;
 
   .header-img {
     display: inline-block;
@@ -457,6 +464,7 @@ export default {
       color: #ccc;
       background-color: #fff;
       border-radius: 5px;
+      text-align: left;
 
       &:empty:before {
         content: attr(placeholder);
@@ -489,6 +497,7 @@ export default {
 
 .my-comment-reply {
   margin-left: 50px;
+  text-align: left;
 
   .reply-input {
     width: flex;
@@ -501,6 +510,7 @@ export default {
 
 .author-title {
   padding: 10px;
+  width: 100%;
 
   .header-img {
     display: inline-block;
@@ -514,6 +524,7 @@ export default {
     width: 60%;
     height: 40px;
     line-height: 20px;
+    text-align: left;
 
     > span {
       display: block;
@@ -555,6 +566,8 @@ export default {
 
   .talk-box {
     margin: 0 50px;
+    text-align: left;
+    padding-left: 2%;
 
     > p {
       margin: 0;
