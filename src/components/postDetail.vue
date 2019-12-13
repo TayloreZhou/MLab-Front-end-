@@ -15,7 +15,7 @@
             </div>
             <div class="post-detail">
               <a class="post-title">{{postData.title}}</a>
-              <a class="post-description">{{$moment(postData.createTime).format('YYYY-MM-DD HH:MM')}}</a>
+              <a class="post-description">{{$moment(postData.createTime).format('YYYY-MM-DD HH:mm')}}</a>
               <p class="post-content">{{postData.content}}</p>
             </div>
             <div>
