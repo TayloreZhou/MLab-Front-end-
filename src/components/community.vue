@@ -31,8 +31,6 @@
           </ul>
           <el-pagination :key="pageshow"
                          @current-change="handleCurrentChange"
-                         @prev-click="handlePrevClick"
-                         @next-click="handleNextClick"
                          :page-size="pageSize"
                          :page-count="pages"
                          :current-page.sync="currentPage"></el-pagination>

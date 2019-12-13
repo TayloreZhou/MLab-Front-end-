@@ -22,7 +22,7 @@
               <a class="comment-num">{{postData.commentNum}} comment</a>
               <el-button :icon="likeIcon"
                          :type="likeType"
-                         @click="handleLike"
+                         @click="handlePostLike"
                          class="like-button">{{postData.likeNum}} </el-button>
             </div>
             <div>
@@ -256,7 +256,8 @@ export default {
       postData: {},
       likeIcon: 'el-icon-star-off',
       likeType: 'primary',
-      author: ''
+      author: '',
+      postLikeNum: 0
     }
   },
   directives: { clickoutside },
@@ -269,6 +270,7 @@ export default {
         console.log('post data\n')
         console.log(response.data)
         this.postData = response.data
+        this.postLikeNum = response.data.likeNum
         this.author = response.data.username
         this.checkPostLike()
       })
@@ -389,13 +391,43 @@ export default {
           }
         })
     },
-    handleLike () {
+    handlePostLike () {
       if (this.likeType === '') {
-        this.likeType = 'primary'
+        this.$axios.post('/boot/like/post', {
+          username: this.author,
+          type: 0,
+          typeId: this.postId,
+          likedUsername: this.author
+        }).then(response => {
+          console.response()
+        }).catch(error => {
+          console.log(error)
+        })
       } else if (this.likeType === 'primary') {
-        this.likeType = ''
+        this.$axios.post('/boot/unlike/post', {
+          username: this.author,
+          type: 0,
+          typeId: this.postId,
+          likedUsername: this.author
+        }).then(response => {
+          console.log(response)
+        }).catch(error => {
+          console.log(error)
+        })
       }
+      this.$axios
+        .get('/boot/post/' + this.postId)
+        .then(response => {
+          console.log('post data\n')
+          console.log(response.data)
+          this.$set(this.postData, 'likeNum', response.data.likeNum)
+          this.checkPostLike()
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
+
   }
 }
 </script>
