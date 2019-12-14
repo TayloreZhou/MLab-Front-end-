@@ -93,7 +93,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  if (token === undefined) {
+  if (!token) {
     if (!(to.name === 'login')) {
       next({
         name: 'login'

@@ -57,12 +57,12 @@ export default {
   name: 'layout',
   methods: {
     myInfo () {
-      this.$router.push({path: '/canvas'})
+      this.$router.push('/canvas')
     },
     logout () {
-      this.$router.push({path: '/login'})
       this.$store.commit('del_token')
       this.$store.commit('del_username')
+      this.$router.push('/login')
     },
     myJob () {
       this.$router.push({path: '/joblist'})

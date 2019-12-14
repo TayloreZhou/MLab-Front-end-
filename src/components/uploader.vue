@@ -30,7 +30,7 @@
 
           <ul class="file-list">
             <li v-for="file in props.fileList" :key="file.id">
-              <uploader-file :class="'file_' + file.id" ref="files" :file="file" :list="true"></uploader-file>
+              <uploader-file :class="'file_' + file.id" ref="files" :file="file" :list="true" :value="0"></uploader-file>
             </li>
           </ul>
         </div>
@@ -49,11 +49,11 @@ export default {
   name: 'myUploader',
   data () {
     return {
+      datasetId: 0,
       options: {
         target: '/server/data-service/chunk',
-        chunkSize: '2048000',
-        maxChunkRetries: 3,
-        simultaneousUploads: 1,
+        chunkSize: '20480',
+        maxChunkRetries: 1,
         testChunks: true
       },
       attrs: {
@@ -67,8 +67,7 @@ export default {
         waiting: 'Waiting'
       },
       panelShow: false, // 选择文件后，展示上传panel
-      collapse: false,
-      datasetId: 0
+      collapse: false
     }
   },
   methods: {
@@ -76,38 +75,59 @@ export default {
       $('#global-uploader-btn').click()
     },
     onFileAdded (file) {
-      console.log(file)
-      this.panelShow = true
-      this.$axios({
-        method: 'post',
-        url: '/server/metadata-service/dataset',
-        body: {
-          'username': localStorage.getItem('username'),
-          'datasetName': file.name.split('.')[0],
-          'description': '',
-          'format': file.name.split('.').pop(),
-          'size': file.size,
-          'isPublic': 1
+      this.$msgbox({
+        title: 'Please input description',
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        showCancelButton: true,
+        data: this.dataInfo,
+        message: <div>
+          <span>Description </span><input ref="description"></input>
+          <label>Is Public <input class="mui-switch mui-switch-anim" type="checkbox" ref="isPublic"/></label>
+        </div>
+      }).then(() => {
+        var isP = false
+        if (this.$refs.isPublic.value === 'on') {
+          isP = true
         }
-      }).then((response) => {
-        this.datasetId = response.data.msg
+        this.$axios({
+          method: 'post',
+          url: '/server/metadata-service/dataset',
+          data: {
+            'username': localStorage.getItem('username'),
+            'datasetName': file.name.split('.')[0],
+            'description': this.$refs.description.value,
+            'format': file.name.split('.').pop(),
+            'size': file.size,
+            'isPublic': isP
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then((response) => {
+          file.uniqueIdentifier = response.data.msg
+          this.panelShow = true
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'Error',
+          message: 'Open File Failed'
+        })
       })
     },
-    // 上传完成
     complete () {
-      console.log('complete', arguments)
+      this.$message({
+        type: 'Info',
+        message: 'Upload success'
+      })
     },
-    // 一个根文件（文件夹）成功上传完成。
-    onFileComplete () {
-      const file = arguments[0].file
-      const chunkSize = 10 * 1024 * 1024
-      let chunks = Math.ceil(file.size / chunkSize)
+    onFileComplete (rootFile) {
       this.$axios({
         url: '/server/data-service/merge',
         method: 'post',
         params: {
-          'datasetId': this.datasetId,
-          'chunkNum': chunks
+          'identifier': rootFile.uniqueIdentifier,
+          'totalChunkNum': rootFile.chunks.length
         }
       }).then(function (response) {
         console.log(response)
@@ -140,7 +160,6 @@ export default {
     }
   },
   computed: {
-    // Uploader实例
     uploader () {
       return this.$refs.uploader.uploader
     }
@@ -232,4 +251,87 @@ export default {
     position: absolute;
     clip: rect(0, 0, 0, 0);
   }
+
+label{
+  display:block;
+  vertical-align: middle;
+  margin-top: 1ch;
+}
+label, input, select{
+  vertical-align: middle;
+}
+.mui-switch {
+  width: 52px;
+  height: 31px;
+  position: relative;
+  border: 1px solid #dfdfdf;
+  background-color: #fdfdfd;
+  box-shadow: #dfdfdf 0 0 0 0 inset;
+  border-radius: 20px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-clip: content-box;
+  display: inline-block;
+  -webkit-appearance: none;
+  user-select: none;
+  outline: none; }
+  .mui-switch:before {
+    content: '';
+    width: 29px;
+    height: 29px;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    border-radius: 20px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
+  .mui-switch:checked {
+    border-color: #64bd63;
+    box-shadow: #64bd63 0 0 0 16px inset;
+    background-color: #64bd63; }
+    .mui-switch:checked:before {
+      left: 21px; }
+  .mui-switch.mui-switch-animbg {
+    transition: background-color ease 0.4s; }
+    .mui-switch.mui-switch-animbg:before {
+      transition: left 0.3s; }
+    .mui-switch.mui-switch-animbg:checked {
+      box-shadow: #dfdfdf 0 0 0 0 inset;
+      background-color: #64bd63;
+      transition: border-color 0.4s, background-color ease 0.4s; }
+      .mui-switch.mui-switch-animbg:checked:before {
+        transition: left 0.3s; }
+  .mui-switch.mui-switch-anim {
+    transition: border cubic-bezier(0, 0, 0, 1) 0.4s, box-shadow cubic-bezier(0, 0, 0, 1) 0.4s; }
+    .mui-switch.mui-switch-anim:before {
+      transition: left 0.3s; }
+    .mui-switch.mui-switch-anim:checked {
+      box-shadow: #64bd63 0 0 0 16px inset;
+      background-color: #64bd63;
+      transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s; }
+      .mui-switch.mui-switch-anim:checked:before {
+        transition: left 0.3s; }
+    input{
+                border: 1px solid #ccc;
+                padding: 7px 0px;
+                border-radius: 3px;
+                padding-left:5px;
+                -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+                box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+                -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+                -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+                transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+            }
+            input:focus{
+                    border-color: #66afe9;
+                    outline: 0;
+                    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+                    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
+            }
 </style>

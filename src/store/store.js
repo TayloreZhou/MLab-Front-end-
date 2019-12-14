@@ -24,7 +24,7 @@ const store = new Vuex.Store({
       state.username = username
       localStorage.setItem('username', username)
     },
-    del_username (state, username) {
+    del_username (state) {
       state.username = ''
       localStorage.removeItem('username')
     }
