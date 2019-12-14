@@ -318,7 +318,9 @@ export default {
           content: this.commentInput
         }).then(response => {
           console.log(response.data)
-          if (response.data) {
+          if (response.data > 0) {
+            newComment.commentId = response.data
+            newComment.replies = []
             this.comments.unshift(newComment)
           }
         })
@@ -348,6 +350,7 @@ export default {
         }).then(response => {
           if (response.data) {
             this.comments[i].replies.unshift(newReply)
+            console.log('comments' + i + ' : ' + this.comments[i])
           }
         })
         let input = document.getElementById('replyInput')
@@ -550,7 +553,6 @@ export default {
     width: 60%;
     height: 40px;
     line-height: 20px;
-    text-align: left;
 
     > span {
       display: block;
@@ -564,10 +566,12 @@ export default {
       color: #000;
       font-size: 18px;
       font-weight: bold;
+      text-align: left;
     }
 
     .author-time {
       font-size: 14px;
+      text-align: left;
     }
   }
 
