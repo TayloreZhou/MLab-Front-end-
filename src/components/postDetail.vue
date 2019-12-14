@@ -76,7 +76,30 @@
                       class="reply">{{item.content}}</span>
               </p>
             </div>
+            <div v-show="_inputShow(i)"
+                 class="my-reply my-comment-reply">
+              <el-avatar class="header-img"
+                         :size="40"
+                         :src="userInfo.avatar"></el-avatar>
+              <div class="reply-info">
+                <div tabindex="0"
+                     id="replyInput"
+                     contenteditable="true"
+                     spellcheck="false"
+                     placeholder="输入回复..."
+                     @input="onReplyInput($event)"
+                     class="reply-input reply-comment-input"></div>
+              </div>
+              <div class=" reply-btn-box">
+                <el-button class="reply-btn"
+                           size="medium"
+                           @click="sendCommentReply(i)"
+                           type="primary">发表回复</el-button>
+              </div>
+            </div>
+
             <div class="reply-box">
+
               <div v-for="(reply,j) in item.replies"
                    :key="j"
                    class="author-title">
@@ -99,28 +122,13 @@
                 <div class="reply-box">
                 </div>
               </div>
-            </div>
-            <div v-show="_inputShow(i)"
-                 class="my-reply my-comment-reply">
-              <el-avatar class="header-img"
-                         :size="40"
-                         :src="userInfo.avatar"></el-avatar>
-              <div class="reply-info">
-                <div tabindex="0"
-                     id="replyInput"
-                     contenteditable="true"
-                     spellcheck="false"
-                     placeholder="输入回复..."
-                     @input="onReplyInput($event)"
-                     class="reply-input reply-comment-input"></div>
-              </div>
-              <div class=" reply-btn-box">
-                <el-button class="reply-btn"
-                           size="medium"
-                           @click="sendCommentReply(i)"
-                           type="primary">发表回复</el-button>
+              <div v-if="item.replyNum > 1"
+                   v-on:click="changeReplyFold(i)">
+                <el-link type="info"
+                         :disabled="!comments[i].replyInfo.hasNextPage">{{comments[i].replyInfo.hasNextPage?'展开更多回复 ↓':'没有更多回复了'}}</el-link>
               </div>
             </div>
+
           </div>
           <div v-if="postData.commentNum > 2"
                v-on:click="changeCommentFold">
@@ -252,12 +260,9 @@ export default {
   directives: { clickoutside },
   created: function () {
     this.postId = this.$route.query.postId
-    console.log(this.postId)
     this.$axios
       .get('/boot/post/' + this.postId)
       .then(response => {
-        console.log('post data\n')
-        console.log(response.data)
         this.postData = response.data
         this.postLikeNum = response.data.likeNum
         this.author = response.data.username
@@ -308,8 +313,8 @@ export default {
         newComment.username = this.userInfo.username
         newComment.avatarUrl = this.userInfo.avatar
         newComment.createTime = '刚刚'
-        newComment.replyNum = 1
-        newComment.likeNum = 1
+        newComment.replyNum = 0
+        newComment.likeNum = 0
         newComment.content = this.commentInput
         newComment.inputShow = false
         this.$axios.post('/boot/comment/publish', {
@@ -317,11 +322,11 @@ export default {
           username: this.userInfo.username,
           content: this.commentInput
         }).then(response => {
-          console.log(response.data)
           if (response.data > 0) {
             newComment.commentId = response.data
             newComment.replies = []
             this.comments.unshift(newComment)
+            this.postData.commentNum++
           }
         })
         let input = document.getElementById('commentInput')
@@ -350,22 +355,20 @@ export default {
         }).then(response => {
           if (response.data) {
             this.comments[i].replies.unshift(newReply)
-            console.log('comments' + i + ' : ' + this.comments[i])
+            this.comments[i].replyNum++
           }
         })
         let input = document.getElementById('replyInput')
         this.replyInput = ''
         input.innerHTML = ''
-        // document.getElementsByClassName('reply-comment-input')[i].innerHTML = ''
+        // document.getElementsById('replyInput')[i].innerHTML = ''
       }
     },
     onDivInput: function (e) {
       this.commentInput = e.target.innerHTML
-      console.log('comment input:' + this.commentInput)
     },
     onReplyInput: function (e) {
       this.replyInput = e.target.innerHTML
-      console.log('reply input:' + this.replyInput)
     },
     dateStr (date) {
       // 获取js 时间戳
@@ -398,7 +401,6 @@ export default {
       this.$axios
         .get('/boot/like/check?user=' + this.author + '&&type=0&&type-id=' + this.postId)
         .then(response => {
-          console.log(response.data)
           if (response.data === true) {
             this.likeType = 'primary'
           } else {
@@ -443,23 +445,52 @@ export default {
         })
     },
     getComments (pageNum, pageSize) {
+      // 请求评论
       this.$axios
         .get('/boot/comment/get-comments-of-post/' + this.postData.postId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
         .then(response => {
           console.log(response.data)
-          for (var item of response.data.list) {
-            item.replies = []
-            this.comments.push(item)
+          // result为comment构成的列表
+          var result = []
+          result = response.data.list
+          for (var i = 0; i < result.length; i++) {
+            var comment = result[i]
+            comment.replies = []
+            comment.replyInfo = {}
+            this.comments.push(comment)
+            this.getReplies(1, 2, i)
           }
           this.commentInfo.currentPage = response.data.pageNum
           this.commentInfo.hasNextPage = response.data.hasNextPage
           this.commentInfo.pageNum = response.data.size
-          console.log(this.comments)
+        })
+      console.log('1234567')
+      console.log(this.comments)
+    },
+    getReplies (pageNum, pageSize, i) {
+      var comment = this.comments[i]
+      this.$axios
+        .get('/boot/reply/get-replies-of-comment/' + comment.commentId + '?page-num=' + pageNum + '&&page-size=' + 2)
+        .then(response => {
+          console.log('comment  ' + comment.commentId + ':' + response.data)
+          for (var re of response.data.list) {
+            this.comments[i].replies.push(re)
+          }
+          this.comments[i].replyInfo.currentPage = response.data.pageNum
+          this.comments[i].replyInfo.hasNextPage = response.data.hasNextPage
+          this.comments[i].replyInfo.pageNum = response.data.size
         })
     },
     changeCommentFold () {
       if (this.commentInfo.hasNextPage) {
         this.getComments(this.commentInfo.currentPage + 1, this.commentInfo.pageSize)
+      }
+    },
+    changeReplyFold (i) {
+      console.log('change' + i)
+      var comment = this.comments[i]
+      if (comment.replyInfo.hasNextPage) {
+        this.getReplies(comment.replyInfo.currentPage + 1, 2, i)
       }
     }
 
