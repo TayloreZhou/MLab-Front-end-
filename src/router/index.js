@@ -13,6 +13,11 @@ import article from '../components/article'
 import uploader from '../components/uploader'
 import uploaderBoot from '../components/upload_boot/uploaderBoot'
 import testSideBar from '../components/testComponet/testSideBar'
+import userDetail from '../components/upload_boot/userDetail'
+import userInfo from '../components/userInfo'
+import userPost from '../components/userPost'
+import userDataset from '../components/userDataset'
+import datasetCommunity from '../components/dataset_community/datasetCommunity'
 
 Vue.use(Router)
 
@@ -24,6 +29,43 @@ export default new Router({
       name: '/',
       component: layout,
       children: [
+        {
+          path: '/dCommunity',
+          name: 'dCommunity',
+          component: datasetCommunity
+        },
+        {
+          path: '/userDetail',
+          name: 'userDetail',
+          component: userDetail,
+          children: [
+            {
+              path: '/userDetail/info',
+              name: 'info',
+              component: userInfo
+            },
+            {
+              path: '/userDetail/posts',
+              name: 'posts',
+              component: userPost
+            },
+            {
+              path: '/userDetail/dataset',
+              name: 'dataset',
+              component: userDataset
+            },
+            {
+              path: '/userDetail/train',
+              name: 'train',
+              component: trainlist
+            },
+            {
+              path: '/userDetail/predict',
+              name: 'predict',
+              component: predictlist
+            }
+          ]
+        },
         {
           path: '/uploaderTest',
           name: 'uploaderTest',

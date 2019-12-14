@@ -13,29 +13,29 @@
               <div style="width: 60%;margin: auto">
                 <el-form :model="ruleForm" status-icon :rules="rules"
                          ref="ruleForm" class="demo-ruleForm" style="margin-top: 20px">
-                  <el-form-item label="账号" prop="id">
+                  <el-form-item label="Username" prop="id">
                     <el-input v-model.number="ruleForm.id"></el-input>
                   </el-form-item>
-                  <el-form-item label="密码" prop="pass">
+                  <el-form-item label="Password" prop="pass">
                     <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
                   </el-form-item>
                   <el-form-item>
                     <el-row type="flex" justify="space-around">
                       <el-col>
-                        <router-link to="/register">注册</router-link>
+                        <router-link to="/register">Sign In</router-link>
                       </el-col>
                       <el-col>
-                        <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+                        <el-button type="primary" @click="submitForm('ruleForm')">Login</el-button>
                       </el-col>
                       <el-col>
-                        <el-button @click="resetForm('ruleForm')">重置</el-button>
+                        <el-button @click="resetForm('ruleForm')">Reset</el-button>
                       </el-col>
                     </el-row>
                   </el-form-item>
                   <el-form-item>
                     <el-row type="flex" justify="space-around">
                       <el-col>
-                        <a href="">忘记密码</a>
+                        <a href="">Forget password?</a>
                       </el-col>
                     </el-row>
                   </el-form-item>
@@ -66,11 +66,11 @@ export default {
   data () {
     var checkId = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('账号不能为空'))
+        return callback(new Error('Username can\'t be empty!'))
       }
       setTimeout(() => {
         if (!Number.isInteger(value)) {
-          callback(new Error('请输入数字值'))
+          callback(new Error('Should be a number'))
         } else {
           callback()
         }
@@ -78,7 +78,7 @@ export default {
     }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码'))
+        callback(new Error('Password can\'t be empty!'))
       } else {
         if (this.ruleForm.checkPass !== '') {
           this.$refs.ruleForm.validateField('checkPass')
@@ -114,16 +114,16 @@ export default {
                 this.$router.push({path: './canvas'})
               } else {
                 this.$notify.error({
-                  title: '错误',
-                  message: '密码错误'
+                  title: 'Error',
+                  message: 'Password incorrect!'
                 })
               }
             })
             .catch((error) => {
               console.log(error)
               this.$notify.error({
-                title: '错误',
-                message: '登录失败'
+                title: 'error',
+                message: 'Login failure!'
               })
             })
         } else {
