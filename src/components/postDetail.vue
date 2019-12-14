@@ -43,7 +43,7 @@
                    contenteditable="true"
                    id="commentInput"
                    spellcheck="false"
-                   placeholder="输入评论..."
+                   placeholder="Input a comment..."
                    class="reply-input"
                    @focus="showReplyBtn"
                    @input="onDivInput($event)">
@@ -54,7 +54,7 @@
               <el-button class="reply-btn"
                          size="medium"
                          @click="sendComment"
-                         type="primary">发表评论</el-button>
+                         type="primary">Publish!</el-button>
             </div>
           </div>
           <div v-for="(item,i) in comments"
@@ -66,7 +66,7 @@
             <div class="author-info">
               <span class="author-name">{{item.username}}</span>
               <span class="author-time">
-                {{item.createTime != '刚刚'?$moment(item.createTime).format('YYYY-MM-DD HH:mm'):'刚刚'}}</span>
+                {{item.createTime != 'just a minute'?$moment(item.createTime).format('YYYY-MM-DD HH:mm'):'just a minute'}}</span>
             </div>
             <div class="icon-btn">
               <span @click="showReplyInput(i)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
@@ -212,7 +212,7 @@ export default {
         username: 'hpy',
         email: 'EMAIL',
         likeNum: 10000000,
-        avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443788&di=95bd4d1f71ad1d8604bd3b190b15b3c5&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201902%2F19%2F20190219130018_wwfpe.jpg'
+        avatar: ''
       },
       userInfo: {
         username: 'jj',
@@ -234,6 +234,7 @@ export default {
         this.postLikeNum = response.data.likeNum
         this.author = response.data.username
         this.authorInfo.username = this.author
+        this.authorInfo.avatar = response.data.avatarUrl
         this.checkPostLike()
         this.getComments(1, this.commentInfo.pageSize)
       })
@@ -273,13 +274,13 @@ export default {
         this.$message({
           showClose: true,
           type: 'warning',
-          message: '评论不能为空'
+          message: 'Comment cannot be empty!'
         })
       } else {
         let newComment = {}
         newComment.username = this.userInfo.username
         newComment.avatarUrl = this.userInfo.avatar
-        newComment.createTime = '刚刚'
+        newComment.createTime = 'just a minute'
         newComment.replyNum = 0
         newComment.likeNum = 0
         newComment.content = this.commentInput
@@ -292,6 +293,7 @@ export default {
           if (response.data > 0) {
             newComment.commentId = response.data
             newComment.replies = []
+            newComment.likeStatus = false
             this.comments.unshift(newComment)
             this.postData.commentNum++
           }
@@ -306,14 +308,14 @@ export default {
         this.$message({
           showClose: true,
           type: 'warning',
-          message: '回复不能为空'
+          message: 'Reply cannot be empty'
         })
       } else {
         // this.comments[i].reply.push(a)
         let newReply = {}
         newReply.username = this.userInfo.username
         newReply.avatarUrl = this.userInfo.avatar
-        newReply.createTime = '刚刚'
+        newReply.createTime = 'just a minute'
         newReply.content = this.replyInput
         this.$axios.post('/boot/reply/publish', {
           username: this.userInfo.username,
