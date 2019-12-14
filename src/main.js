@@ -13,7 +13,7 @@ import moment from 'moment'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 
-process.env.Mock && require('./mock/index')
+// process.env.Mock && require('./mock/index')
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios

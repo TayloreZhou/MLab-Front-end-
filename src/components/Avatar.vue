@@ -13,7 +13,7 @@
         :on-success="handleAvatarSuccess"
         :before-upload="beforeAvatarUpload">
         <img v-if="imageUrl" :src="imageUrl" class="avatar">
-        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        <i v-if="plus" class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
     </el-card>
   </div>
@@ -27,7 +27,8 @@ export default {
     return {
       imageUrl: '',
       progressPercent: 0,
-      progressFlag: false
+      progressFlag: false,
+      plus: true
     }
   },
   methods: {
@@ -36,6 +37,7 @@ export default {
     },
     beforeAvatarUpload (file) {
       this.progressFlag = true
+      this.plus = false
       const isJPG = file.type === 'image/jpeg' || file.type === 'png'
       const isLt2M = file.size / 1024 / 1024 < 5
       if (!isJPG) {
