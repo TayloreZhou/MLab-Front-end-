@@ -58,9 +58,7 @@
                   <el-dropdown-item icon="el-icon-user"
                                     @click.native="myInfo">Profile</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-box"
-                                    @click.native="modeList">Models</el-dropdown-item>
-                  <el-dropdown-item icon="el-icon-s-order"
-                                    @click.native="myJob">Jobs</el-dropdown-item>
+                                    @click.native="modelList">Models</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-s-comment"
                                     @click.native="myPost">Posts</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-close"
@@ -141,8 +139,8 @@ export default {
         })
       }
     },
-    myJob () {
-      this.$router.push({ path: '/joblist/train' })
+    modelList () {
+      this.$router.push({ path: '/modellist' })
     },
     myPost () {
       this.$router.push({ path: '/userDetail/posts' })

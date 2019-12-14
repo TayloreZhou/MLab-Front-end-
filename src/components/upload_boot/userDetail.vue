@@ -14,12 +14,6 @@
         <el-button type="text" @click="userInfo">Profile</el-button>
       </el-row>
       <el-row>
-        <el-button type="text" @click="trainJob">Train Jobs</el-button>
-      </el-row>
-      <el-row>
-        <el-button type="text" @click="predictJob">Predict Jobs</el-button>
-      </el-row>
-      <el-row>
         <el-button type="text" @click="posts">Post</el-button>
       </el-row>
       <el-row>
@@ -38,12 +32,6 @@ export default {
   methods: {
     userInfo () {
       this.$router.push({ path: '/userDetail/info' })
-    },
-    trainJob () {
-      this.$router.push({ path: '/userDetail/train' })
-    },
-    predictJob () {
-      this.$router.push({ path: '/userDetail/predict' })
     },
     posts () {
       this.$router.push({ path: '/userDetail/posts' })
