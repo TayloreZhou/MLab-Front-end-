@@ -107,7 +107,9 @@ export default {
       this.$router.push({ path: '/userDetail/info' })
     },
     logout () {
-      this.$router.push({ path: '/login' })
+      this.$store.commit('del_token')
+      this.$store.commit('del_username')
+      this.$router.push('/login')
     },
     myJob () {
       this.$router.push({ path: '/joblist/train' })

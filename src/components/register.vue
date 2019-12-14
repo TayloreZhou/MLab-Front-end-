@@ -2,10 +2,10 @@
   <div style="width: 1200px;margin: auto">
     <el-container>
       <el-row>
-        <el-col span="4" offset="1">
+        <el-col :span="4" :offset="1">
           <div><img src="../assets/185-43-hor.png" alt="MLab"/></div>
-        </el-col>
-        <el-col span="2" offset="17">
+        </el-col>"
+        <el-col :span="2" :offset="17">
           <div style="margin-top: 20px">
             <el-link href="/login" >Log In</el-link>
           </div>
@@ -37,7 +37,7 @@
       <el-divider content-position="left">Welcome to MLab!</el-divider>
       <el-footer>
         <el-row type="flex" justify="center">
-          <el-col span="4" style="vertical-align: middle">
+          <el-col :span="4" style="vertical-align: middle">
             <div style="color: rgba(0,0,0,0.6);">
               Made In China
             </div>
@@ -98,7 +98,8 @@ export default {
     }
     return {
       ruleForm: {
-        pass: '',
+        username: '',
+        password: '',
         checkPass: '',
         name: '',
         email: ''
@@ -123,19 +124,24 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$confirm('Congratulation! You can click confirm button to link to Login page.', 'Login Successfully', {
-            confirmButtonText: 'Confirm',
-            type: 'success',
-            center: true
-          }).then(() => {
-            this.$router.push({ path: '/login' })
-          }).catch(() => {
+          this.$axios.post('/server/user-service/register', {
+            'username': this.ruleForm.username,
+            'password': this.ruleForm.password,
+            'email': this.ruleForm.email,
+            'avatarUrl': this.ruleForm.avatarUrl
+          }
+          ).then((response) => {
+            if (response.status === 200) {
+              this.$router.push('/login')
+            } else if (response.status === 409) {
+              this.$message('Username existed!')
+            } else {
+              this.$message('Register Error!')
+            }
           })
         } else {
-          this.$notify.error({
-            title: 'Error',
-            message: 'Please fix the error!'
-          })
+          this.$message('Reigster Error!')
+          return false
         }
       })
     },
