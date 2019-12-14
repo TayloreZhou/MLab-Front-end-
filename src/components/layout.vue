@@ -9,12 +9,24 @@
             <div><img src="../assets/185-43-hor.png"
                    alt="Mlab" /></div>
           </el-col>
-          <el-col :span=4
-                  :offset=8>
-            <div style="margin-top: 10px">
-              <el-input placeholder="搜索帖子"
-                        prefix-icon="el-icon-search"
-                        v-model="searchInput">
+          <el-col :span=8
+                  :offset=4>
+            <div style="margin-top: 10px;">
+              <el-input placeholder="请输入内容"
+                        v-model="searchInput"
+                        class="input-with-select">
+                <el-select v-model="select"
+                           slot="prepend"
+                           style="width: 100px"
+                           placeholder="post">
+                  <el-option label="post"
+                             value="1"></el-option>
+                  <el-option label="dataset"
+                             value="2"></el-option>
+                </el-select>
+                <el-button slot="append"
+                           @click="search"
+                           icon="el-icon-search"></el-button>
               </el-input>
             </div>
           </el-col>
@@ -83,6 +95,7 @@ export default {
   data () {
     return {
       searchInput: '',
+      select: 'post',
       minHeight: 0,
       circleUrl: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
     }
@@ -103,6 +116,23 @@ export default {
     },
     myJob () {
       this.$router.push({ path: '/joblist' })
+    },
+    search () {
+      if (this.searchInput === '') {
+        this.$message({
+          showClose: true,
+          type: 'warning',
+          message: 'The content of search cannot be null!'
+        })
+      } else {
+        console.log(this.searchInput)
+        this.$router.push({
+          path: '/society',
+          query: {
+            searchInput: this.searchInput
+          }
+        })
+      }
     }
   }
 }
@@ -112,5 +142,12 @@ export default {
 .container {
   width: 1200px;
   margin: auto;
+}
+.el-select .el-input {
+  width: 50px;
+}
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+  width: 50px;
 }
 </style>
