@@ -10,7 +10,7 @@
                    alt="Mlab" /></div>
           </el-col>
           <el-col :span=8
-                  :offset=4>
+                  :offset=2>
             <div style="margin-top: 10px;">
               <el-input placeholder="Please input something to search"
                         v-model="searchInput"
@@ -35,7 +35,7 @@
               <el-button style="color: rgba(0,0,0,0.7)" type="text" @click="Canvas">Canvas</el-button>
             </div>
           </el-col>
-          <el-col :span=4>
+          <el-col :span=3>
             <el-dropdown style="margin-top: 18px">
                 <span class="el-dropdown-link">
                   Community<i class="el-icon-arrow-down el-icon--right"></i>
