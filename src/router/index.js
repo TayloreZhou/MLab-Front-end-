@@ -22,7 +22,7 @@ import datasetDetail from '../components/dataset_community/datasetDetail'
 
 Vue.use(Router)
 
-const router = new Router({
+export default new Router({
   mode: 'history',
   routes: [
     {
@@ -138,26 +138,3 @@ const router = new Router({
     }
   ]
 })
-
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    if (!(to.name === 'login')) {
-      next({
-        name: 'login'
-      })
-    } else {
-      next()
-    }
-  } else {
-    if (to.name === 'login' || to.name === 'register') {
-      next({
-        name: '/'
-      })
-    } else {
-      next()
-    }
-  }
-})
-
-export default router

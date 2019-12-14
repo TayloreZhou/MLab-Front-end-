@@ -111,6 +111,9 @@ export default {
       this.$store.commit('del_username')
       this.$router.push('/login')
     },
+    logout () {
+      this.$router.push({ path: '/login' })
+    },
     myJob () {
       this.$router.push({ path: '/joblist/train' })
     },

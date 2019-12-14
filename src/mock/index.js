@@ -1,6 +1,12 @@
 import Mock from 'mockjs'
 
 const vehicle = Mock.mock(
+  '/server/metadata-service/dataset', 'post', (req, res) => {
+    return {
+      msg: 1234
+    }
+  })
+const car = Mock.mock(
   '/boot/model', 'post', (req, res) => {
     return ['aqw', 'qweqe', 'qeqwdas']
   })
@@ -138,5 +144,6 @@ export default {
   dComment1,
   dComment2,
   dReply1,
-  dReply2
+  dReply2,
+  car
 }

@@ -1,6 +1,7 @@
 <template>
   <el-row>
     <el-divider></el-divider>
+    <my-uploader ref="myUploaderAlpha"></my-uploader>
     <el-row>
       <el-col span="6">
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
@@ -10,7 +11,7 @@
         </el-form>
       </el-col>
       <el-col offset="14" span="2">
-        <el-button type="primary">File<i class="el-icon-upload el-icon--right"></i></el-button>
+        <el-button type="primary" @click="myUpload">File<i class="el-icon-upload el-icon--right"></i></el-button>
       </el-col>
       <el-col span="2">
         <el-button @click="uploadModel('ruleForm')" type="primary">Model<i class="el-icon-upload el-icon--right"></i></el-button>
@@ -46,9 +47,12 @@ import go from 'gojs'
 import $ from 'jquery'
 import Inspector from '../assets/js/DataInspector'
 import '../assets/css/DataInspector.css'
+import {ACCEPT_CONFIG} from '../assets/js/config'
+import MyUploader from './uploader'
 const MAKE = go.GraphObject.make
 export default {
   name: 'canvas',
+  components: {MyUploader},
   data () {
     var checkName = (rule, value, callback) => {
       console.log(value)
@@ -72,7 +76,26 @@ export default {
         modelName: [
           { validator: checkName, trigger: 'blur' }
         ]
-      }
+      },
+      datasetId: 0,
+      options: {
+        target: '/server/data-service/chunk',
+        chunkSize: '20480',
+        maxChunkRetries: 1,
+        testChunks: true
+      },
+      attrs: {
+        accept: ACCEPT_CONFIG.getAll()
+      },
+      statusText: {
+        success: 'Success',
+        error: 'Error',
+        uploading: 'Uploading',
+        paused: 'Pause',
+        waiting: 'Waiting'
+      },
+      panelShow: false, // 选择文件后，展示上传panel
+      collapse: false
     }
   },
   mounted () {
@@ -417,6 +440,105 @@ export default {
     },
     myModel () {
       console.log(this.myDiagram.model.toJSON())
+    },
+    myUpload () {
+      this.$refs.myUploaderAlpha.myUpload()
+    },
+    onFileAdded (file) {
+      this.$msgbox({
+        title: 'Please input description',
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        showCancelButton: true,
+        data: this.dataInfo,
+        message: <div>
+          <span style="width:100%">Description</span>
+          <p><input ref="description"/></p>
+          <span style="width:100%">Is Public <input class="mui-switch mui-switch-anim" type="checkbox" ref="isPublic"/></span>
+        </div>
+      }).then(() => {
+        var isP = false
+        console.log(1)
+        var x = 'sda'
+        console.log(x)
+        if (this.$refs.isPublic.value === 'on') {
+          console.log(1)
+          isP = true
+        }
+        console.log(1)
+        this.$axios({
+          method: 'post',
+          url: '/server/metadata-service/dataset',
+          data: {
+            'username': this.$store.getters.getUsername,
+            'datasetName': file.name.split('.')[0],
+            'description': this.$refs.description.value,
+            'format': file.name.split('.').pop(),
+            'size': file.size,
+            'isPublic': isP
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then((response) => {
+          console.log(response.data.msg)
+          file.uniqueIdentifier = response.data.msg
+          this.panelShow = true
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'Error',
+          message: 'Open File Failed'
+        })
+      })
+    },
+    complete () {
+      this.$message({
+        type: 'Info',
+        message: 'Upload success'
+      })
+    },
+    onFileComplete (rootFile) {
+      this.$axios({
+        url: '/server/data-service/merge',
+        method: 'post',
+        params: {
+          'identifier': rootFile.uniqueIdentifier,
+          'totalChunkNum': rootFile.chunks.length
+        }
+      }).then(function (response) {
+        console.log(response)
+      }).catch(function (error) {
+        console.log(error)
+      })
+    },
+    onFileError (rootFile, file, response, chunk) {
+      this.$message({
+        message: response,
+        type: 'error'
+      })
+    },
+    onFileProgress (rootFile, file, chunk) {
+      console.log(`Uploading ${file.name}, chunk: ${chunk.startByte / 1024 / 1024} ~ ${chunk.endByte / 1024 / 1024}`)
+    },
+    fileListShow () {
+      let $list = $('#global-uploader .file-list')
+      if ($list.is(':visible')) {
+        $list.slideUp()
+        this.collapse = true
+      } else {
+        $list.slideDown()
+        this.collapse = false
+      }
+    },
+    close () {
+      this.uploader.cancel()
+      this.panelShow = false
+    }
+  },
+  computed: {
+    uploader () {
+      return this.$refs.uploader.uploader
     }
   }
 }

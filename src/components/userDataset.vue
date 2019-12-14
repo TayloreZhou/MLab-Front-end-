@@ -26,14 +26,15 @@
       </el-table-column>
       <el-table-column
         label="public"
-        width="180">
+        width="100">
         <template slot-scope="scope">
           <div slot="reference" class="name-wrapper">
             <el-tag size="medium">{{ scope.row.isPublic === 1? 'yes' : 'no' }}</el-tag>
           </div>
         </template>
       </el-table-column>
-      <el-table-column>
+      <el-table-column
+        width="250">
         <template slot="header" slot-scope="scope">
           <el-input
             v-model="search"
@@ -43,11 +44,15 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            @click="handleEdit(scope.$index, scope.row)">edit</el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            @click="handleDelete(scope.$index, scope.row)">delete</el-button>
+          <el-button
+            size="mini"
+            type="success"
+            @click="handleDownload(scope.$index, scope.row)">download</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -339,6 +344,10 @@ export default {
     }
   },
   methods: {
+    handleDownload (index, row) {
+      this.form = Object.assign({}, row)
+      this.dialogFormVisible = true
+    },
     handleEdit (index, row) {
       this.form = Object.assign({}, row)
       this.dialogFormVisible = true
@@ -348,12 +357,33 @@ export default {
       this.$confirm('This operation will permanently delete this file. Do you want to continue?', 'Tips', {
         confirmButtonText: 'Confirm',
         cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: 'Delete successfully!'
-        })
+        type: 'warning',
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = 'Deleting...'
+            this.$axios
+              .post('/boot/model')
+              .then((response) => {
+                instance.confirmButtonLoading = false
+                done()
+                this.$message({
+                  type: 'success',
+                  message: 'Delete successfully!'
+                })
+              }).catch((error) => {
+                console.log(error)
+                instance.confirmButtonLoading = false
+                done()
+                this.$message({
+                  type: 'info',
+                  message: 'Delete, canceled!'
+                })
+              })
+          } else {
+            done()
+          }
+        }
       }).catch(() => {
         this.$message({
           type: 'info',

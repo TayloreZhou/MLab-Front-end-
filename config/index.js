@@ -25,11 +25,11 @@ module.exports = {
           '^/server': '/'
         }
       },
-      '/image': {
-        target: 'https://sm.ms/api/v2/upload',
+      '/boot': {
+        target: 'http://localhost:8084',
         changeOrigin: true,
         pathRewrite: {
-          '^/image': '/'
+          '^/boot': ''
         }
       }
     },

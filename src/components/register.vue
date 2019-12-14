@@ -2,10 +2,10 @@
   <div style="width: 1200px;margin: auto">
     <el-container>
       <el-row>
-        <el-col :span="4" :offset="1">
+        <el-col span="4" offset="1">
           <div><img src="../assets/185-43-hor.png" alt="MLab"/></div>
-        </el-col>"
-        <el-col :span="2" :offset="17">
+        </el-col>
+        <el-col span="2" offset="17">
           <div style="margin-top: 20px">
             <el-link href="/login" >Log In</el-link>
           </div>
@@ -37,7 +37,7 @@
       <el-divider content-position="left">Welcome to MLab!</el-divider>
       <el-footer>
         <el-row type="flex" justify="center">
-          <el-col :span="4" style="vertical-align: middle">
+          <el-col span="4" style="vertical-align: middle">
             <div style="color: rgba(0,0,0,0.6);">
               Made In China
             </div>
@@ -98,8 +98,7 @@ export default {
     }
     return {
       ruleForm: {
-        username: '',
-        password: '',
+        pass: '',
         checkPass: '',
         name: '',
         email: ''
