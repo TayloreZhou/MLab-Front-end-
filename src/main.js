@@ -12,9 +12,8 @@ import uploader from 'vue-simple-uploader'
 import moment from 'moment'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
-import axios from 'axios'
 
-// process.env.Mock && require('./mock.js')
+process.env.Mock && require('./mock/index')
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
@@ -22,6 +21,7 @@ Vue.prototype.$moment = moment
 
 Vue.use(ElementUI, { locale })
 Vue.use(uploader)
+Vue.use(mavonEditor)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

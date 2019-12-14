@@ -120,7 +120,8 @@ export default {
               if (this.$store.state.token) {
                 this.$router.push('/')
               }
-            })
+            }
+          })
             .catch((error) => {
               console.log(error)
               this.$notify.error({
