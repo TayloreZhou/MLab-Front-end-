@@ -70,11 +70,14 @@ export default {
       pageSize: 10,
       pages: 1,
       currentPage: 1,
-      pageshow: true
+      pageshow: true,
+      searchInput: ''
     }
   },
   created: function () {
     // 默认获取最热信息
+    this.searchInput = this.$route.query.searchInput
+    console.log(this.searchInput)
     this.getList(1)
   },
   methods: {

@@ -19,9 +19,11 @@
               <p class="post-content">{{postData.content}}</p>
             </div>
             <div>
-              <a class="comment-num">{{postData.commentNum}} comment</a>
-              <el-button :icon="likeIcon"
+              <i class="icon-btn el-icon-s-comment"
+                 style="float:right; padding-top:4px">{{postData.commentNum}}</i>
+              <el-button icon="el-icon-caret-top"
                          :type="likeType"
+                         size="mini"
                          @click="handlePostLike"
                          class="like-button">{{postData.likeNum}} </el-button>
             </div>
@@ -39,7 +41,7 @@
             <div class="reply-info">
               <div tabindex="0"
                    contenteditable="true"
-                   id="replyInput"
+                   id="commentInput"
                    spellcheck="false"
                    placeholder="输入评论..."
                    class="reply-input"
@@ -61,66 +63,82 @@
                -title reply-father">
             <el-avatar class="header-img"
                        :size="40"
-                       :src="item.headImg"></el-avatar>
+                       :src="item.avatarUrl"></el-avatar>
             <div class="author-info">
-              <span class="author-name">{{item.name}}</span>
-              <span class="author-time">{{item.time}}</span>
+              <span class="author-name">{{item.username}}</span>
+              <span class="author-time">
+                {{item.createTime != '刚刚'?$moment(item.createTime).format('YYYY-MM-DD HH:mm'):'刚刚'}}</span>
             </div>
             <div class="icon-btn">
-              <span @click="showReplyInput(i,item.name,item.id)"><i class="iconfont el-icon-s-comment"></i>{{item.commentNum}}</span>
-              <i class="iconfont el-icon-caret-top"></i>{{item.like}}
+              <span @click="showReplyInput(i)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
+              <span name="like"
+                    @click="handleLikeComment(i)"><i class="iconfont el-icon-caret-top"
+                   type="primary"></i>{{item.likeNum}}</span>
             </div>
             <div class="talk-box">
               <p>
-                <span class="reply">{{item.comment}}</span>
+                <span v-html="item.content"
+                      class="reply">{{item.content}}</span>
               </p>
-            </div>
-            <div class="reply-box">
-              <div v-for="(reply,j) in item.reply"
-                   :key="j"
-                   class="author-title">
-                <el-avatar class="header-img"
-                           :size="40"
-                           :src="reply.fromHeadImg"></el-avatar>
-                <div class="author-info">
-                  <span class="author-name">{{reply.from}}</span>
-                  <span class="author-time">{{reply.time}}</span>
-                </div>
-                <div class="icon-btn">
-                  <span @click="showReplyInput(i,reply.from,reply.id)"><i class="iconfont el-icon-s-comment"></i>{{reply.commentNum}}</span>
-                  <i class="iconfont el-icon-caret-top"></i>{{reply.like}}
-                </div>
-                <div class="talk-box">
-                  <p>
-                    <span>回复 {{reply.to}}:</span>
-                    <span class="reply">{{reply.comment}}</span>
-                  </p>
-                </div>
-                <div class="reply-box">
-
-                </div>
-              </div>
             </div>
             <div v-show="_inputShow(i)"
                  class="my-reply my-comment-reply">
               <el-avatar class="header-img"
                          :size="40"
-                         :src="userInfo.avator"></el-avatar>
+                         :src="userInfo.avatar"></el-avatar>
               <div class="reply-info">
                 <div tabindex="0"
+                     id="replyInput"
                      contenteditable="true"
                      spellcheck="false"
-                     placeholder="输入评论..."
-                     @input="onDivInput($event)"
+                     placeholder="输入回复..."
+                     @input="onReplyInput($event)"
                      class="reply-input reply-comment-input"></div>
               </div>
               <div class=" reply-btn-box">
                 <el-button class="reply-btn"
                            size="medium"
-                           @click="sendCommentReply(i,j)"
-                           type="primary">发表评论</el-button>
+                           @click="sendCommentReply(i)"
+                           type="primary">发表回复</el-button>
               </div>
             </div>
+
+            <div class="reply-box">
+
+              <div v-for="(reply,j) in item.replies"
+                   :key="j"
+                   class="author-title">
+                <el-avatar class="header-img"
+                           :size="40"
+                           :src="reply.avatarUrl"></el-avatar>
+                <div class="author-info">
+                  <span class="author-name">{{reply.username}}</span>
+                  <span class="author-time">{{reply.createTime}}</span>
+                </div>
+                <div class="icon-btn">
+                  <!-- reply不需要点赞与回复 -->
+                </div>
+                <div class="talk-box">
+                  <p>
+                    <span>回复 {{item.username}}:</span>
+                    <span class="reply">{{reply.content}}</span>
+                  </p>
+                </div>
+                <div class="reply-box">
+                </div>
+              </div>
+              <div v-if="item.replyNum > 1"
+                   v-on:click="changeReplyFold(i)">
+                <el-link type="info"
+                         :disabled="!comments[i].replyInfo.hasNextPage">{{comments[i].replyInfo.hasNextPage?'展开更多回复 ↓':'没有更多回复了'}}</el-link>
+              </div>
+            </div>
+
+          </div>
+          <div v-if="postData.commentNum > 2"
+               v-on:click="changeCommentFold">
+            <el-link type="primary"
+                     :disabled="!commentInfo.hasNextPage">{{commentInfo.hasNextPage?'展开更多评论 ↓':'没有更多评论了'}}</el-link>
           </div>
         </el-main>
       </el-container>
@@ -172,121 +190,53 @@ export default {
     return {
       btnShow: false,
       index: '0',
-      replyComment: '',
+      commentInput: '',
+      likeStyle: 'iconfont el-icon-caret-top',
+      replyInput: '',
       myName: 'Lana Del Rey',
       myId: 19870621,
       to: '',
       toId: -1,
-      comments: [
-        // {
-        //   name: 'Lana Del Rey',
-        //   id: 19870621,
-        //   headImg: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
-        //   comment: '我发布一张新专辑Norman Fucking Rockwell,大家快来听啊',
-        //   time: '2019年9月16日 18:43',
-        //   commentNum: 2,
-        //   like: 15,
-        //   inputShow: false,
-        //   reply: [
-        //     {
-        //       from: 'Taylor Swift',
-        //       fromId: 19891221,
-        //       fromHeadImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
-        //       to: 'Lana Del Rey',
-        //       toId: 19870621,
-        //       comment: '我很喜欢你的新专辑！！',
-        //       time: '2019年9月16日 18:43',
-        //       commentNum: 1,
-        //       like: 15,
-        //       inputShow: false
-        //     },
-        //     {
-        //       from: 'Ariana Grande',
-        //       fromId: 1123,
-        //       fromHeadImg: 'https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg',
-        //       to: 'Lana Del Rey',
-        //       toId: 19870621,
-        //       comment: '别忘记宣传我们的合作单曲啊',
-        //       time: '2019年9月16日 18:43',
-        //       commentNum: 0,
-        //       like: 5,
-        //       inputShow: false
-
-        //     }
-        //   ]
-        // },
-        // {
-        //   name: 'Taylor Swift',
-        //   id: 19891221,
-        //   headImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
-        //   comment: '我发行了我的新专辑Lover',
-        //   time: '2019年9月16日 18:43',
-        //   commentNum: 1,
-        //   like: 5,
-        //   inputShow: false,
-        //   reply: [
-        //     {
-        //       from: 'Lana Del Rey',
-        //       fromId: 19870621,
-        //       fromHeadImg: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
-        //       to: 'Taylor Swift',
-        //       toId: 19891221,
-        //       comment: '新专辑和speak now 一样棒！',
-        //       time: '2019年9月16日 18:43',
-        //       commentNum: 25,
-        //       like: 5,
-        //       inputShow: false
-
-        //     }
-        //   ]
-        // },
-        // {
-        //   name: 'Norman Fucking Rockwell',
-        //   id: 20190830,
-        //   headImg: 'https://ae01.alicdn.com/kf/Hdd856ae4c81545d2b51fa0c209f7aa28Z.jpg',
-        //   comment: 'Plz buy Norman Fucking Rockwell on everywhere',
-        //   time: '2019年9月16日 18:43',
-        //   commentNum: 0,
-        //   like: 5,
-        //   inputShow: false,
-        //   reply: []
-        // }
-      ],
+      comments: [],
       postId: '',
       postData: {},
       likeIcon: 'el-icon-star-off',
       likeType: 'primary',
       author: '',
+      commentInfo: {
+        currentPage: 1,
+        hasNextPage: true,
+        pageNum: '',
+        pageSize: 2
+      },
       authorInfo: {
-        username: 'HPY',
+        username: 'hpy',
         email: 'EMAIL',
         likeNum: 10000000,
-        avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
-
+        avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443788&di=95bd4d1f71ad1d8604bd3b190b15b3c5&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201902%2F19%2F20190219130018_wwfpe.jpg'
       },
       userInfo: {
-        username: 'JJN',
+        username: 'jj',
         email: 'EMAIL',
         likeNum: 100,
-        avatar: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg'
+        avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443792&di=a59189a577729463ee4c42ccada26eb0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201802%2F27%2F20180227201208_ujwhc.jpeg'
 
-      }
+      },
+      commentFold: true
     }
   },
   directives: { clickoutside },
   created: function () {
     this.postId = this.$route.query.postId
-    console.log(this.postId)
     this.$axios
       .get('/boot/post/' + this.postId)
       .then(response => {
-        console.log('post data\n')
-        console.log(response.data)
         this.postData = response.data
         this.postLikeNum = response.data.likeNum
         this.author = response.data.username
         this.authorInfo.username = this.author
         this.checkPostLike()
+        this.getComments(1, this.commentInfo.pageSize)
       })
       .catch(error => {
         console.log(error)
@@ -294,77 +244,99 @@ export default {
   },
   methods: {
     inputFocus () {
-      var replyInput = document.getElementById('replyInput')
-      replyInput.style.padding = '8px 8px'
-      replyInput.style.border = '2px solid blue'
-      replyInput.focus()
+      var commentInput = document.getElementById('commentInput')
+      commentInput.style.padding = '8px 8px'
+      commentInput.style.border = '2px solid blue'
+      commentInput.focus()
     },
     showReplyBtn () {
       this.btnShow = true
     },
     hideReplyBtn () {
       this.btnShow = false
-      document.getElementById('replyInput').style.padding = '10px'
-      document.getElementById('replyInput').style.border = 'none'
+      document.getElementById('commentInput').style.padding = '10px'
+      document.getElementById('commentInput').style.border = 'none'
     },
-    showReplyInput (i, name, id) {
+    showReplyInput (i) {
       this.comments[this.index].inputShow = false
       this.index = i
-      this.comments[i].inputShow = true
-      this.to = name
-      this.toId = id
+      // this.comments[i].inputShow = true
+      this.$set(this.comments[i], 'inputShow', true)
+      this.$forceUpdate()
+      // this.to = name
+      // this.toId = id
     },
     _inputShow (i) {
       return this.comments[i].inputShow
     },
     sendComment () {
-      if (!this.replyComment) {
+      if (!this.commentInput) {
         this.$message({
           showClose: true,
           type: 'warning',
           message: '评论不能为空'
         })
       } else {
-        let a = {}
-        let input = document.getElementById('replyInput')
-        let timeNow = new Date().getTime()
-        let time = this.dateStr(timeNow)
-        a.name = this.myName
-        a.comment = this.replyComment
-        a.headImg = this.userInfo.avator
-        a.time = time
-        a.commentNum = 0
-        a.like = 0
-        this.comments.push(a)
-        this.replyComment = ''
+        let newComment = {}
+        newComment.username = this.userInfo.username
+        newComment.avatarUrl = this.userInfo.avatar
+        newComment.createTime = '刚刚'
+        newComment.replyNum = 0
+        newComment.likeNum = 0
+        newComment.content = this.commentInput
+        newComment.inputShow = false
+        this.$axios.post('/boot/comment/publish', {
+          postId: this.postData.postId,
+          username: this.userInfo.username,
+          content: this.commentInput
+        }).then(response => {
+          if (response.data > 0) {
+            newComment.commentId = response.data
+            newComment.replies = []
+            this.comments.unshift(newComment)
+            this.postData.commentNum++
+          }
+        })
+        let input = document.getElementById('commentInput')
+        this.commentInput = ''
         input.innerHTML = ''
       }
     },
-    sendCommentReply (i, j) {
-      if (!this.replyComment) {
+    sendCommentReply (i) {
+      if (!this.replyInput) {
         this.$message({
           showClose: true,
           type: 'warning',
-          message: '评论不能为空'
+          message: '回复不能为空'
         })
       } else {
-        let a = {}
-        let timeNow = new Date().getTime()
-        let time = this.dateStr(timeNow)
-        a.from = this.myName
-        a.to = this.to
-        a.fromHeadImg = this.userInfo.avator
-        a.comment = this.replyComment
-        a.time = time
-        a.commentNum = 0
-        a.like = 0
-        this.comments[i].reply.push(a)
-        this.replyComment = ''
-        document.getElementsByClassName('reply-comment-input')[i].innerHTML = ''
+        // this.comments[i].reply.push(a)
+        let newReply = {}
+        newReply.username = this.userInfo.username
+        newReply.avatarUrl = this.userInfo.avatar
+        newReply.createTime = '刚刚'
+        newReply.content = this.replyInput
+        this.$axios.post('/boot/reply/publish', {
+          username: this.userInfo.username,
+          commentId: this.comments[i].commentId,
+          content: this.replyInput
+        }).then(response => {
+          if (response.data) {
+            this.comments[i].replies.unshift(newReply)
+            this.comments[i].replyNum++
+          }
+        })
+        let input = document.getElementById('replyInput')
+        this.replyInput = ''
+        input.innerHTML = ''
+        // document.getElementsById('replyInput')[i].innerHTML = ''
       }
     },
     onDivInput: function (e) {
-      this.replyComment = e.target.innerHTML
+      this.commentInput = e.target.innerHTML
+    },
+    onReplyInput: function (e) {
+      this.replyInput = e.target.innerHTML
     },
     dateStr (date) {
       // 获取js 时间戳
@@ -397,7 +369,6 @@ export default {
       this.$axios
         .get('/boot/like/check?user=' + this.author + '&&type=0&&type-id=' + this.postId)
         .then(response => {
-          console.log(response.data)
           if (response.data === true) {
             this.likeType = 'primary'
           } else {
@@ -405,11 +376,18 @@ export default {
           }
         })
     },
+    checkCommentLike (i) {
+      this.$axios
+        .get('/boot/like/check?user=' + this.userInfo.username + '&&type=1&&type-id=' + this.comments[i].commentId)
+        .then(response => {
+          this.comments[i].likeStatus = response.data
+          document.getElementsByName('like')[i].style.color = response.data ? '#3293ee' : ''
+        })
+    },
     handlePostLike () {
       if (this.likeType === '') {
         this.$axios.post('/boot/like/post', {
           username: this.author,
-          type: 0,
           typeId: this.postId,
           likedUsername: this.author
         }).then(response => {
@@ -440,6 +418,91 @@ export default {
         .catch(error => {
           console.log(error)
         })
+    },
+    handleLikeComment (i) {
+      if (this.comments[i].likeStatus === false) {
+        this.$axios.post('/boot/like/comment', {
+          username: this.userInfo.username,
+          typeId: this.comments[i].commentId
+        }).then(response => {
+          console.log(response)
+          this.checkCommentLike(i)
+          if (response.data) {
+            this.$set(this.comments[i], 'likeNum', this.comments[i].likeNum + 1)
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      } else if (this.comments[i].likeStatus === true) {
+        this.$axios.post('/boot/unlike/comment', {
+          username: this.userInfo.username,
+          typeId: this.comments[i].commentId
+        }).then(response => {
+          this.checkCommentLike(i)
+          if (response.data) {
+            this.$set(this.comments[i], 'likeNum', this.comments[i].likeNum - 1)
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+      var like = document.getElementsByName('like')[i]
+      like.style.color = '#3293ee'
+      // this.$axios.post
+      // if (document.getElementById('like')[i].hasClass('el-icon-caret-top')) {
+      //   document.getElementById('like')[i].classList.remove('el-icon-caret-top')
+      //   document.getElementById('like')[i].classList.add('el-icon-caret-top')
+      // }
+    },
+    getComments (pageNum, pageSize) {
+      // 请求评论
+      this.$axios
+        .get('/boot/comment/get-comments-of-post/' + this.postData.postId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
+        .then(response => {
+          console.log(response.data)
+          // result为comment构成的列表
+          var result = []
+          result = response.data.list
+          for (var i = 0; i < result.length; i++) {
+            var comment = result[i]
+            comment.replies = []
+            comment.replyInfo = {}
+            this.comments.push(comment)
+            this.checkCommentLike(i)
+            this.getReplies(1, 2, i)
+          }
+          this.commentInfo.currentPage = response.data.pageNum
+          this.commentInfo.hasNextPage = response.data.hasNextPage
+          this.commentInfo.pageNum = response.data.size
+        })
+      console.log('1234567')
+      console.log(this.comments)
+    },
+    getReplies (pageNum, pageSize, i) {
+      var comment = this.comments[i]
+      this.$axios
+        .get('/boot/reply/get-replies-of-comment/' + comment.commentId + '?page-num=' + pageNum + '&&page-size=' + 2)
+        .then(response => {
+          console.log('comment  ' + comment.commentId + ':' + response.data)
+          for (var re of response.data.list) {
+            this.comments[i].replies.push(re)
+          }
+          this.comments[i].replyInfo.currentPage = response.data.pageNum
+          this.comments[i].replyInfo.hasNextPage = response.data.hasNextPage
+          this.comments[i].replyInfo.pageNum = response.data.size
+        })
+    },
+    changeCommentFold () {
+      if (this.commentInfo.hasNextPage) {
+        this.getComments(this.commentInfo.currentPage + 1, this.commentInfo.pageSize)
+      }
+    },
+    changeReplyFold (i) {
+      console.log('change' + i)
+      var comment = this.comments[i]
+      if (comment.replyInfo.hasNextPage) {
+        this.getReplies(comment.replyInfo.currentPage + 1, 2, i)
+      }
     }
 
   }
@@ -449,6 +512,7 @@ export default {
 .my-reply {
   padding: 10px;
   background-color: #fafbfc;
+  text-align: left;
 
   .header-img {
     display: inline-block;
@@ -471,6 +535,7 @@ export default {
       color: #ccc;
       background-color: #fff;
       border-radius: 5px;
+      text-align: left;
 
       &:empty:before {
         content: attr(placeholder);
@@ -503,6 +568,7 @@ export default {
 
 .my-comment-reply {
   margin-left: 50px;
+  text-align: left;
 
   .reply-input {
     width: flex;
@@ -515,6 +581,7 @@ export default {
 
 .author-title {
   padding: 10px;
+  width: 100%;
 
   .header-img {
     display: inline-block;
@@ -541,10 +608,12 @@ export default {
       color: #000;
       font-size: 18px;
       font-weight: bold;
+      text-align: left;
     }
 
     .author-time {
       font-size: 14px;
+      text-align: left;
     }
   }
 
@@ -569,6 +638,8 @@ export default {
 
   .talk-box {
     margin: 0 50px;
+    text-align: left;
+    padding-left: 2%;
 
     > p {
       margin: 0;
@@ -645,6 +716,7 @@ export default {
   padding: auto;
   margin-right: 10px;
   margin-bottom: 10px;
+  size: mini;
 }
 
 .comment-num {
