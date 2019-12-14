@@ -142,12 +142,12 @@ export default {
 .bg_log_in{
   background: url("../assets/bg_login.jpg") no-repeat;
   background-size: cover;
-  height: 500px;
+  height: 800px;
 }
 .login_form{
   background: rgba(255, 255, 255, 0.75);
   text-align: center;
-  margin-top: 90px;
+  margin-top: 200px;
 }
 .text_foot{
   color: #000000;

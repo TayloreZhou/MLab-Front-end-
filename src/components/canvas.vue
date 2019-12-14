@@ -63,7 +63,7 @@ export default {
       stateP2: 1,
       stateP3: 1,
       myDiagram: null,
-      files: 'sda',
+      files: ['22'],
       datasetName: ['sdad', 'ads', 'sadwwww'],
       ruleForm: {
         modelName: ''
@@ -199,17 +199,14 @@ export default {
       }) // 构建gojs对象
       console.log(mySelf.myDiagram)
       mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
-        debugger
         console.log(e.subject.part)
       })
 
       mySelf.myDiagram.addDiagramListener('BackgroundSingleClicked', function (e) {
-        debugger
         console.log('Double-clicked at' + e.diagram.lastInput.documentPoint)
       })
 
       mySelf.myDiagram.addDiagramListener('ClipboardPasted', function (e) {
-        debugger
         console.log('Pasted' + e.diagram.selection.count + 'parts')
       })
 
@@ -239,6 +236,7 @@ export default {
             'name': { show: Inspector.showIfPresent },
             'InputCol': { show: Inspector.showIfPresent },
             'OutputCol': { show: Inspector.showIfPresent },
+            'choices': {show: false},
             'fileName': {
               show: Inspector.showIfPresent,
               type: 'select',
@@ -252,15 +250,18 @@ export default {
         })
       this.$axios.post('/boot/model')
         .then((response) => {
+          console.log('1', this.files)
           console.log('1', response.data)
+          this.files = []
+          for (var i = 0; i < response.data.length; i++) {
+            this.files.push(response.data[i])
+          }
+          this.init()
           console.log('2', this.files)
-          this.files = response.data
-          console.log('3', this.files)
         })
         .catch((error) => {
           console.log(error)
         })
-      this.init()
     })
   },
   methods: {
@@ -294,8 +295,8 @@ export default {
       this.$axios.post('/boot/model')
         .then((response) => {
           console.log('1', response.data)
+          this.files = Object.assign([], response.data)
           console.log('2', this.files)
-          return ['s', 'ss', 'sss']
         })
         .catch((error) => {
           console.log(error)
@@ -332,7 +333,7 @@ export default {
         copiesArrays: true,
         copiesArrayObjects: true,
         nodeDataArray: [
-          {key: 101, category: 'Input', name: 'InputNode', fileName: '', choices: this.$store.getters.getFiles}
+          {key: 101, category: 'Input', name: 'InputNode', fileName: '', choices: this.files}
         ]
       })
       myPaletteLevel2.model = MAKE(go.GraphLinksModel, {

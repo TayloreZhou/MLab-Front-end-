@@ -18,6 +18,7 @@ import userInfo from '../components/userInfo'
 import userPost from '../components/userPost'
 import userDataset from '../components/userDataset'
 import datasetCommunity from '../components/dataset_community/datasetCommunity'
+import datasetDetail from '../components/dataset_community/datasetDetail'
 
 Vue.use(Router)
 
@@ -29,6 +30,11 @@ export default new Router({
       name: '/',
       component: layout,
       children: [
+        {
+          path: '/dCommunity/detail',
+          name: 'datasetDetail',
+          component: datasetDetail
+        },
         {
           path: '/dCommunity',
           name: 'dCommunity',

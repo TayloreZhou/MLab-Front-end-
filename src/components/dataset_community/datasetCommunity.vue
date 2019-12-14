@@ -19,9 +19,9 @@
         <el-main class="main"
                  v-loading="loading">
           <ul>
-            <post v-for=" postData in posts"
-                  :key="postData.post_id"
-                  :postData="postData"></post>
+            <dataset v-for=" dataset in datasets"
+                  :key="dataset.datasetId"
+                  :datasetData="dataset"></dataset>
           </ul>
           <el-pagination :key="pageshow"
                          @current-change="handleCurrentChange"
@@ -49,16 +49,129 @@
 
 <script>
 import Post from '@/components/Post.vue'
+import Dataset from './dataset'
 
 export default {
   name: 'datasetCommunity',
   components: {
+    Dataset,
     post: Post
   },
   data () {
     return {
       msg: '主页',
-      posts: {},
+      datasets: [
+        {
+          datasetId: 1,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 2,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 3,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 4,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 5,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 6,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 7,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 8,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 9,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        },
+        {
+          datasetId: 10,
+          username: 'admin',
+          datasetName: 'A dataset',
+          description: '这是一个传说中的数据集',
+          format: 'txt',
+          size: 123.0,
+          createTime: '2019-12-13 19:57:15',
+          isPublic: 1,
+          status: 1
+        }
+      ],
       loading: true,
       radioOrder: 'hot',
       pageSize: 10,
@@ -82,9 +195,9 @@ export default {
     },
     getList (pageNum) {
       if (this.radioOrder === 'hot') {
-        this.getHotList(pageNum)
+        this.loading = false
       } else if (this.radioOrder === 'latest') {
-        this.getLatestList(pageNum)
+        this.loading = false
       }
       console.log('get' + this.curretPage)
     },
@@ -130,9 +243,6 @@ export default {
       console.log('传入的url' + url)
       let newURL = url.replace('/mini/g', 'large')
       console.log('新的url' + newURL)
-    },
-    gotoLink () {
-      this.$router.push('/society/write')
     },
     handleCurrentChange (val) {
       console.log('handle' + this.currentPage)
