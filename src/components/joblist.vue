@@ -2,7 +2,7 @@
   <div>
     <el-divider content-position="right">My lab, machine lab.</el-divider>
     <el-row>
-      <el-col :span=5>
+      <el-col span="5">
         <h5>作业类型</h5>
         <el-menu
           default-active="2"
@@ -20,7 +20,7 @@
           </el-menu-item>
         </el-menu>
       </el-col>
-      <el-col :span="15">
+      <el-col span="15">
         <router-view></router-view>
       </el-col>
     </el-row>

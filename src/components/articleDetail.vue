@@ -1,66 +1,57 @@
 <template>
-    <el-container class="wrap">
-      <el-header class="header" height="120px">
-        <div class="logo"></div>
-        <el-breadcrumb separator="/" class="nav">
-          <el-breadcrumb-item :to="{ path: '/' }">Hotest</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">Latest</a></el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">节点</a></el-breadcrumb-item>
-          <!-- <el-breadcrumb-item><a href="/">关于</a></el-breadcrumb-item> -->
-        </el-breadcrumb>
-      </el-header>
-      <el-main class="main">
-          <el-card shadow="always" class="post">
-            <div slot="header" class="clearfix">
-                <div class="container">
-                    <!-- <img class="avatar fr" v-bind:src="postContent.member.avatar_mini" alt="avatar"> -->
-                    <el-button size="mini" round> #{{ postContent.node.title }}</el-button>
-                    <h1 class="post-title">{{ postContent.title }}</h1>
-                    <small class="post-author">{{postContent.member.username}}   ● 最后回复 ● {{postContent.last_reply_by}}</small>
-                </div>
-            </div>
-            <div class="content clearfix">
-                <!-- <div class="post-content" v-html="postContent.content_rendered"></div> -->
-                <markdown-it-vue class="md-body" :content="content" :options="options" />
-            </div>
-          </el-card>
-          <ul>
-            <replie class="replie" v-for="replie in postReplies" :key="replie.id" :replie="replie" v-loading="loading"></replie>
-          </ul>
-      </el-main>
-      <el-footer class="footer">
-        <div class="copyright"><a href="https://github.com/hsingyin">@hsingyin </a></div>
-        <small class="slogan">♥ Do have faith in what you're doing.</small>
-      </el-footer>
-    </el-container>
+  <el-container class="wrap">
+    <el-header class="header"
+               height="120px">
+      <el-card>
+        POST
+      </el-card>
+    </el-header>
+    <el-main class="main">
+      <el-card shadow="always"
+               class="post">
+        <div slot="header"
+             class="clearfix">
+          <div class="container">
+            <img class="avatar fr"
+                 v-bind:src="postContent.member.avatar_mini"
+                 alt="avatar">
+            <el-button size="mini"
+                       round> #{{ postContent.node.title }}</el-button>
+            <h1 class="post-title">{{ postContent.title }}</h1>
+            <small class="post-author">{{postContent.member.username}} ● 最后回复 ● {{postContent.last_reply_by}}</small>
+          </div>
+        </div>
+        <div class="content clearfix">
+          <div class="post-content"
+               v-html="postContent.content_rendered"></div>
+        </div>
+      </el-card>
+      <ul>
+        <replie class="replie"
+                v-for="replie in postReplies"
+                :key="replie.id"
+                :replie="replie"
+                v-loading="loading"></replie>
+      </ul>
+    </el-main>
+    <el-footer class="footer">
+      <div class="copyright"><a href="https://github.com/hsingyin">@hsingyin </a></div>
+      <small class="slogan">♥ Do have faith in what you're doing.</small>
+    </el-footer>
+  </el-container>
 </template>
 <script>
-import MarkdownItVue from 'markdown-it-vue'
-import 'markdown-it-vue/dist/markdown-it-vue.css'
 import Replies from '@/components/Replies'
 export default {
   name: 'postDetail',
   components: {
-    'replie': Replies,
-    MarkdownItVue
+    'replie': Replies
   },
   data () {
     return {
       postContent: {},
       postReplies: [],
-      loading: true,
-      content: '# markdown-it-vue\n## GitHub Table of Contents',
-      options: {
-        markdownIt: {
-          linkify: true
-        },
-        linkAttributes: {
-          attrs: {
-            target: '_blank',
-            rel: 'noopener'
-          }
-        }
-      }
+      loading: true
     }
   },
   created: function () {

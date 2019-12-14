@@ -18,18 +18,11 @@ module.exports = {
           '^/api': '/api'
         }
       },
-      '/server': {
-        target: 'http://localhost:8070',
+      '/boot': {
+        target: 'http://localhost:8084',
         changeOrigin: true,
         pathRewrite: {
-          '^/server': '/'
-        }
-      },
-      '/image': {
-        target: 'https://sm.ms/api/v2/upload',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/image': '/'
+          '^/boot': ''
         }
       }
     },
