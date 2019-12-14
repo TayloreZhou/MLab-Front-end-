@@ -14,6 +14,10 @@ import uploader from '../components/uploader'
 import uploaderBoot from '../components/upload_boot/uploaderBoot'
 import testSideBar from '../components/testComponet/testSideBar'
 import modelList from '../components/modelList'
+import pipeline from '../components/pipeline'
+import trainingJobs from '../components/trainingJobs'
+import model from '../components/model'
+import predictJobs from '../components/predictJobs'
 
 Vue.use(Router)
 
@@ -58,7 +62,29 @@ export default new Router({
         {
           path: '/modellist',
           name: 'modelList',
-          component: modelList
+          component: modelList,
+          children: [
+            {
+              path: '/modellist/pipeline',
+              name: 'pipeline',
+              component: pipeline
+            },
+            {
+              path: '/modellist/train',
+              name: 'train',
+              component: trainingJobs
+            },
+            {
+              path: '/modellist/model',
+              name: 'model',
+              component: model
+            },
+            {
+              path: '/modellist/predict',
+              name: 'predict',
+              component: predictJobs
+            }
+          ]
         },
         {
           path: '/joblist',

@@ -2,42 +2,40 @@
   <div v-loading="loading">
     <el-divider></el-divider>
     <div id="PaletteAndDiagram">
-      <div class="tabber" @click="goBack"><i class="el-icon-back"/></div>
+      <div class="tabber"
+           @click="goBack"><i class="el-icon-back" /></div>
       <div id="sideBar">
         <div id="accordion">
           <h4 @click="showPaletteLevel1">Input Layer</h4>
           <div>
-            <div
-              id="myPaletteLevel1"
-              style="display:none"
-              class="myPaletteDiv"
-            ></div>
+            <div id="myPaletteLevel1"
+                 style="display:none"
+                 class="myPaletteDiv"></div>
           </div>
           <h4 @click="showPaletteLevel2">Node layer</h4>
           <div>
-            <div
-              id="myPaletteLevel2"
-              style="display:none"
-              class="myPaletteDiv"
-            ></div>
+            <div id="myPaletteLevel2"
+                 style="display:none"
+                 class="myPaletteDiv"></div>
           </div>
           <h4 @click="showPaletteLevel3">Output Layer</h4>
           <div>
-            <div
-              id="myPaletteLevel3"
-              style="display:none"
-              class="myPaletteDiv"
-            ></div>
+            <div id="myPaletteLevel3"
+                 style="display:none"
+                 class="myPaletteDiv"></div>
           </div>
         </div>
       </div>
       <div id="myDiagramDiv"></div>
-      <div id="infoBar" class="inspector"></div>
+      <div id="infoBar"
+           class="inspector"></div>
       <div id="subbmitButton">
-        <el-button @click="commit" type="primary" round>commit</el-button>
+        <el-button @click="commit"
+                   type="primary"
+                   round>commit</el-button>
       </div>
       <div style="position: fixed; right: 100px; top: 200px">
-        <el-button @click="myModel" ></el-button>
+        <el-button @click="myModel"></el-button>
       </div>
     </div>
   </div>
@@ -57,7 +55,8 @@ export default {
       stateP2: 0,
       stateP3: 0,
       myDiagram: null,
-      loading: false
+      loading: false,
+      username: 'cbc'
     }
   },
   mounted () {
@@ -474,7 +473,7 @@ export default {
       }
       return 0
     },
-    onSubmit () {},
+    onSubmit () { },
     showPaletteLevel1 () {
       if (this.stateP1 === 0) {
         $('#myPaletteLevel1').slideDown()
@@ -531,8 +530,12 @@ export default {
       console.log('OK')
       this.loading = true
       this.$axios({
+        method: 'get',
+        url: 'userservice/user/info'
+      })
+      this.$axios({
         method: 'post',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         url: '/boot/api/model/generate/123/912?description=221',
         data: this.myDiagram.model.toJSON()
       }).then(response => {

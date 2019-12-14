@@ -1,35 +1,50 @@
 <template>
   <div id="global-uploader">
-    <el-button type="primary" @click="myUpload"></el-button>
+    <el-button type="primary"
+               @click="myUpload"></el-button>
     <!-- 上传 -->
-    <uploader
-      ref="uploader"
-      :options="options"
-      :autoStart="false"
-      @file-added="onFileAdded"
-      @file-success="onFileSuccess"
-      @file-progress="onFileProgress"
-      @file-error="onFileError"
-      class="uploader-app">
+    <uploader ref="uploader"
+              :options="options"
+              :autoStart="false"
+              @file-added="onFileAdded"
+              @file-success="onFileSuccess"
+              @file-progress="onFileProgress"
+              @file-error="onFileError"
+              class="uploader-app">
       <uploader-unsupport></uploader-unsupport>
 
-      <uploader-btn id="global-uploader-btn" single="true" :attrs="attrs" ref="uploadBtn">选择文件</uploader-btn>
+      <uploader-btn id="global-uploader-btn"
+                    single="true"
+                    :attrs="attrs"
+                    ref="uploadBtn">选择文件</uploader-btn>
 
       <uploader-list v-show="panelShow">
-        <div class="file-panel" slot-scope="props" :class="{'collapse': collapse}">
+        <div class="file-panel"
+             slot-scope="props"
+             :class="{'collapse': collapse}">
           <div class="file-title">
             <h2>文件列表</h2>
             <div class="operate">
-              <el-button :icon="collapse ? 'el-icon-arrow-up': 'el-icon-arrow-down'" @click="fileListShow" type="text" :title="collapse ? '展开':'折叠' ">
+              <el-button :icon="collapse ? 'el-icon-arrow-up': 'el-icon-arrow-down'"
+                         @click="fileListShow"
+                         type="text"
+                         :title="collapse ? '展开':'折叠' ">
               </el-button>
-              <el-button @click="close" type="text" title="关闭" icon="el-icon-close">
+              <el-button @click="close"
+                         type="text"
+                         title="关闭"
+                         icon="el-icon-close">
               </el-button>
             </div>
           </div>
 
           <ul class="file-list">
-            <li v-for="file in props.fileList" :key="file.id">
-              <uploader-file :class="'file_' + file.id" ref="files" :file="file" :list="true"></uploader-file>
+            <li v-for="file in props.fileList"
+                :key="file.id">
+              <uploader-file :class="'file_' + file.id"
+                             ref="files"
+                             :file="file"
+                             :list="true"></uploader-file>
             </li>
           </ul>
         </div>
@@ -41,7 +56,7 @@
 </template>
 
 <script>
-import {ACCEPT_CONFIG} from '../assets/js/config'
+import { ACCEPT_CONFIG } from '../assets/js/config'
 import SparkMD5 from 'spark-md5'
 import $ from 'jquery'
 
@@ -252,87 +267,87 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  #global-uploader {
-    position: fixed;
-    z-index: 20;
-    right: 15px;
-    bottom: 200px;
+#global-uploader {
+  position: fixed;
+  z-index: 20;
+  right: 15px;
+  bottom: 200px;
 
-    .uploader-app {
-      width: 1000px;
+  .uploader-app {
+    width: 1000px;
+  }
+
+  .file-panel {
+    background-color: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 7px 7px 0 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+    .file-title {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+
+      .operate {
+        text-align: center;
+        vertical-align: middle;
+        .center-button {
+          margin: 10px auto;
+          font-size: 1.5em;
+        }
+      }
     }
 
-    .file-panel {
+    .file-list {
+      position: relative;
+      height: 240px;
+      overflow-x: hidden;
+      overflow-y: auto;
       background-color: #fff;
-      border: 1px solid #e2e2e2;
-      border-radius: 7px 7px 0 0;
-      box-shadow: 0 0 10px rgba(0, 0, 0, .2);
 
-      .file-title {
-        display: flex;
-        border-bottom: 1px solid #ddd;
-
-        .operate {
-          text-align: center;
-          vertical-align: middle;
-          .center-button {
-            margin: 10px auto;
-            font-size: 1.5em;
-          }
-        }
-      }
-
-      .file-list {
-        position: relative;
-        height: 240px;
-        overflow-x: hidden;
-        overflow-y: auto;
+      > li {
         background-color: #fff;
-
-        > li {
-          background-color: #fff;
-        }
-      }
-
-      &.collapse {
-        .file-title {
-          background-color: #E7ECF2;
-        }
       }
     }
 
-    .no-file {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 16px;
-    }
-
-    /deep/.uploader-file-icon {
-      &:before {
-        content: '' !important;
+    &.collapse {
+      .file-title {
+        background-color: #e7ecf2;
       }
-
-      &[icon=image] {
-        background: url(../assets/images/icon/image-icon.png);
-      }
-      &[icon=video] {
-        background: url(../assets/images/icon/video-icon.png);
-      }
-      &[icon=document] {
-        background: url(../assets/images/icon/text-icon.png);
-      }
-    }
-
-    /deep/.uploader-file-actions > span {
-      margin-right: 6px;
     }
   }
 
-  /* 隐藏上传按钮 */
-  #global-uploader-btn {
+  .no-file {
     position: absolute;
-    clip: rect(0, 0, 0, 0);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
   }
+
+  .uploader-file-icon {
+    &:before {
+      content: "" !important;
+    }
+
+    &[icon="image"] {
+      background: url(../assets/images/icon/image-icon.png);
+    }
+    &[icon="video"] {
+      background: url(../assets/images/icon/video-icon.png);
+    }
+    &[icon="document"] {
+      background: url(../assets/images/icon/text-icon.png);
+    }
+  }
+
+  .uploader-file-actions > span {
+    margin-right: 6px;
+  }
+}
+
+/* 隐藏上传按钮 */
+#global-uploader-btn {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+}
 </style>
