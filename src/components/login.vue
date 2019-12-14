@@ -22,7 +22,7 @@
                   <el-form-item>
                     <el-row type="flex" justify="space-around">
                       <el-col>
-                        <router-link to="/register">Sign In</router-link>
+                        <router-link to="/register">Register</router-link>
                       </el-col>
                       <el-col>
                         <el-button type="primary" @click="submitForm('ruleForm')">Login</el-button>
@@ -106,19 +106,22 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$axios.post('http://localhost:8080/web_test_mav_war/HelloWorld?id=1234&pass=1234')
-            .then((response) => {
-              console.log('su')
-              this.posts = response.data
-              if (this.posts.state === 1) {
-                this.$router.push({path: './canvas'})
-              } else {
-                this.$notify.error({
-                  title: 'Error',
-                  message: 'Password incorrect!'
-                })
+          this.$axios({
+            method: 'post',
+            url: '/server/auth-service/oauth/token?grant_type=password&' +
+              'username=' + this.ruleForm.id + '&password=' + this.ruleForm.pass,
+            headers: {
+              'Authorization': 'Basic YnJvd3NlcjpzZWNyZXQ='
+            }
+          }).then((response) => {
+            if (response.status === 200) {
+              this.$store.commit('set_token', response.data.access_token)
+              this.$store.commit('set_username', this.ruleForm.id)
+              if (this.$store.state.token) {
+                this.$router.push('/')
               }
-            })
+            }
+          })
             .catch((error) => {
               console.log(error)
               this.$notify.error({

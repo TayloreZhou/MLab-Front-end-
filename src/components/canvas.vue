@@ -396,6 +396,7 @@ export default {
             }
           }
         })
+      console.log('hello')
       this.$axios.post('/boot/model')
         .then((response) => {
           console.log('1', this.files)

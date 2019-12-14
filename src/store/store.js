@@ -2,42 +2,33 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-const state = {
-  username: 'admin',
-  token: 'sada',
-  files: ['q', 'qq', 'qqq']
-}
-
-// getters
-const getters = {
-  getUsername () {
-    return state.username
-  },
-  getToken () {
-    return state.token
-  },
-  getFiles () {
-    return state.files
-  }
-}
-
-// mutations
-const mutations = {
-  setToken (state, token) {
-    state.token = token
-  },
-  setUsername (state, username) {
-    state.username = username
-  },
-  setupFiles (state, files) {
-    state.files = files
-  }
-}
-
 const store = new Vuex.Store({
-  state,
-  mutations,
-  getters
+  state: {
+    count: 0,
+    token: localStorage.getItem('token'),
+    username: localStorage.getItem('username')
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    },
+    set_token (state, token) {
+      state.token = token
+      localStorage.setItem('token', token)
+    },
+    del_token (state) {
+      state.token = ''
+      localStorage.removeItem('token')
+    },
+    set_username (state, username) {
+      state.username = username
+      localStorage.setItem('username', username)
+    },
+    del_username (state) {
+      state.username = ''
+      localStorage.removeItem('username')
+    }
+  }
 })
 
 export default store
