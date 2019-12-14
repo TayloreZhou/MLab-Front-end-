@@ -19,9 +19,11 @@
               <p class="post-content">{{postData.content}}</p>
             </div>
             <div>
-              <a class="comment-num">{{postData.commentNum}} comment</a>
-              <el-button :icon="likeIcon"
+              <i class="icon-btn el-icon-s-comment"
+                 style="float:right; padding-top:4px">{{postData.commentNum}}</i>
+              <el-button icon="el-icon-caret-top"
                          :type="likeType"
+                         size="mini"
                          @click="handlePostLike"
                          class="like-button">{{postData.likeNum}} </el-button>
             </div>
@@ -68,7 +70,9 @@
             </div>
             <div class="icon-btn">
               <span @click="showReplyInput(i)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
-              <i class="iconfont el-icon-caret-top"></i>{{item.likeNum}}
+              <span name="like"
+                    @click="handleLikeComment(i)"><i class="iconfont el-icon-caret-top"
+                   type="primary"></i>{{item.likeNum}}</span>
             </div>
             <div class="talk-box">
               <p>
@@ -186,50 +190,13 @@ export default {
       btnShow: false,
       index: '0',
       commentInput: '',
+      likeStyle: 'iconfont el-icon-caret-top',
       replyInput: '',
       myName: 'Lana Del Rey',
       myId: 19870621,
       to: '',
       toId: -1,
-      comments: [
-        // {
-        //   username: 'Lana Del Rey',
-        //   commentId: 19870621,
-        //   avatarUrl: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
-        //   content: '我发布一张新专辑Norman Fucking Rockwell,大家快来听啊',
-        //   createTime: '2019年9月16日 18:43',
-        //   replyNum: 2,
-        //   likeNum: 15,
-        //   inputShow: false
-        //   // reply: [
-        //   //   {
-        //   //     from: 'Taylor Swift',
-        //   //     fromId: 19891221,
-        //   //     fromHeadImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
-        //   //     to: 'Lana Del Rey',
-        //   //     toId: 19870621,
-        //   //     comment: '我很喜欢你的新专辑！！',
-        //   //     time: '2019年9月16日 18:43',
-        //   //     commentNum: 1,
-        //   //     like: 15,
-        //   //     inputShow: false
-        //   //   },
-        //   //   {
-        //   //     from: 'Ariana Grande',
-        //   //     fromId: 1123,
-        //   //     fromHeadImg: 'https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg',
-        //   //     to: 'Lana Del Rey',
-        //   //     toId: 19870621,
-        //   //     comment: '别忘记宣传我们的合作单曲啊',
-        //   //     time: '2019年9月16日 18:43',
-        //   //     commentNum: 0,
-        //   //     like: 5,
-        //   //     inputShow: false
-
-        //   //   }
-        //   // ]
-        // }
-      ],
+      comments: [],
       postId: '',
       postData: {},
       likeIcon: 'el-icon-star-off',
@@ -408,11 +375,18 @@ export default {
           }
         })
     },
+    checkCommentLike (i) {
+      this.$axios
+        .get('/boot/like/check?user=' + this.userInfo.username + '&&type=1&&type-id=' + this.comments[i].commentId)
+        .then(response => {
+          this.comments[i].likeStatus = response.data
+          document.getElementsByName('like')[i].style.color = response.data ? '#3293ee' : ''
+        })
+    },
     handlePostLike () {
       if (this.likeType === '') {
         this.$axios.post('/boot/like/post', {
           username: this.author,
-          type: 0,
           typeId: this.postId,
           likedUsername: this.author
         }).then(response => {
@@ -444,6 +418,41 @@ export default {
           console.log(error)
         })
     },
+    handleLikeComment (i) {
+      if (this.comments[i].likeStatus === false) {
+        this.$axios.post('/boot/like/comment', {
+          username: this.userInfo.username,
+          typeId: this.comments[i].commentId
+        }).then(response => {
+          console.log(response)
+          this.checkCommentLike(i)
+          if (response.data) {
+            this.$set(this.comments[i], 'likeNum', this.comments[i].likeNum + 1)
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      } else if (this.comments[i].likeStatus === true) {
+        this.$axios.post('/boot/unlike/comment', {
+          username: this.userInfo.username,
+          typeId: this.comments[i].commentId
+        }).then(response => {
+          this.checkCommentLike(i)
+          if (response.data) {
+            this.$set(this.comments[i], 'likeNum', this.comments[i].likeNum - 1)
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+      var like = document.getElementsByName('like')[i]
+      like.style.color = '#3293ee'
+      // this.$axios.post
+      // if (document.getElementById('like')[i].hasClass('el-icon-caret-top')) {
+      //   document.getElementById('like')[i].classList.remove('el-icon-caret-top')
+      //   document.getElementById('like')[i].classList.add('el-icon-caret-top')
+      // }
+    },
     getComments (pageNum, pageSize) {
       // 请求评论
       this.$axios
@@ -458,6 +467,7 @@ export default {
             comment.replies = []
             comment.replyInfo = {}
             this.comments.push(comment)
+            this.checkCommentLike(i)
             this.getReplies(1, 2, i)
           }
           this.commentInfo.currentPage = response.data.pageNum
@@ -705,6 +715,7 @@ export default {
   padding: auto;
   margin-right: 10px;
   margin-bottom: 10px;
+  size: mini;
 }
 
 .comment-num {
