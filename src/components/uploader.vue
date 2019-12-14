@@ -1,35 +1,39 @@
 <template>
   <div id="global-uploader">
-    <el-button type="primary" @click="myUpload"></el-button>
     <!-- 上传 -->
     <uploader
       ref="uploader"
       :options="options"
       :autoStart="false"
+      :file-status-text="statusText"
       @file-added="onFileAdded"
-      @file-success="onFileSuccess"
+      @file-complete="onFileComplete"
       @file-progress="onFileProgress"
       @file-error="onFileError"
       class="uploader-app">
       <uploader-unsupport></uploader-unsupport>
 
-      <uploader-btn id="global-uploader-btn" single="true" :attrs="attrs" ref="uploadBtn">选择文件</uploader-btn>
+      <uploader-btn id="global-uploader-btn" :single="true" :attrs="attrs" ref="uploadBtn">选择文件</uploader-btn>
 
       <uploader-list v-show="panelShow">
         <div class="file-panel" slot-scope="props" :class="{'collapse': collapse}">
           <div class="file-title">
-            <h2>文件列表</h2>
-            <div class="operate">
-              <el-button :icon="collapse ? 'el-icon-arrow-up': 'el-icon-arrow-down'" @click="fileListShow" type="text" :title="collapse ? '展开':'折叠' ">
-              </el-button>
-              <el-button @click="close" type="text" title="关闭" icon="el-icon-close">
-              </el-button>
-            </div>
-          </div>
+            <el-row style="width: 100%">
+              <el-col span="5">
+                <p><strong>File List</strong></p>
+              </el-col>
+              <el-col class="operate" offset="14" span="5">
+                  <el-button style="margin-top: 10px" :icon="collapse ? 'el-icon-arrow-up': 'el-icon-arrow-down'" @click="fileListShow" type="text" :title="collapse ? '展开':'折叠' ">
+                  </el-button>
+                  <el-button style="margin-top: 10px" @click="close" type="text" title="关闭" icon="el-icon-close">
+                  </el-button>
+              </el-col>
+            </el-row>
+        </div>
 
           <ul class="file-list">
             <li v-for="file in props.fileList" :key="file.id">
-              <uploader-file :class="'file_' + file.id" ref="files" :file="file" :list="true"></uploader-file>
+              <uploader-file :class="'file_' + file.id" ref="files" :file="file" :list="true" :value="0"></uploader-file>
             </li>
           </ul>
         </div>
@@ -42,39 +46,30 @@
 
 <script>
 import {ACCEPT_CONFIG} from '../assets/js/config'
-import SparkMD5 from 'spark-md5'
 import $ from 'jquery'
-
 export default {
   name: 'myUploader',
   data () {
     return {
+      datasetId: 0,
       options: {
-        target: 'http://localhost:3000/upload',
-        chunkSize: '2048000',
-        fileParameterName: 'upfile',
-        maxChunkRetries: 3,
-        testChunks: true, // 是否开启服务器分片校验
-        // 服务器分片校验函数，秒传及断点续传基础
-        checkChunkUploadedByResponse: function (chunk, message) {
-          let objMessage = JSON.parse(message)
-          if (objMessage.skipUpload) {
-            return true
-          }
-          return (objMessage.uploaded || []).indexOf(chunk.offset + 1) >= 0
-        }
+        target: '/server/data-service/chunk',
+        chunkSize: '20480',
+        maxChunkRetries: 1,
+        testChunks: true
       },
       attrs: {
         accept: ACCEPT_CONFIG.getAll()
       },
+      statusText: {
+        success: 'Success',
+        error: 'Error',
+        uploading: 'Uploading',
+        paused: 'Pause',
+        waiting: 'Waiting'
+      },
       panelShow: false, // 选择文件后，展示上传panel
       collapse: false
-    }
-  },
-  computed: {
-    // Uploader实例
-    uploader () {
-      return this.$refs.uploader.uploader
     }
   },
   methods: {
@@ -82,32 +77,65 @@ export default {
       $('#global-uploader-btn').click()
     },
     onFileAdded (file) {
-      this.panelShow = true
-      this.computeMD5(file)
+      this.$msgbox({
+        title: 'Please input description',
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        showCancelButton: true,
+        data: this.dataInfo,
+        message: <div>
+          <span>Description </span><input ref="description"></input>
+          <label>Is Public <input class="mui-switch mui-switch-anim" type="checkbox" ref="isPublic"/></label>
+        </div>
+      }).then(() => {
+        var isP = false
+        if (this.$refs.isPublic.value === 'on') {
+          isP = true
+        }
+        this.$axios({
+          method: 'post',
+          url: '/server/metadata-service/dataset',
+          data: {
+            'username': this.$store.getters.getUsername,
+            'datasetName': file.name.split('.')[0],
+            'description': this.$refs.description.value,
+            'format': file.name.split('.').pop(),
+            'size': file.size,
+            'isPublic': isP
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then((response) => {
+          file.uniqueIdentifier = response.data.msg
+          this.panelShow = true
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'Error',
+          message: 'Open File Failed'
+        })
+      })
     },
-    onFileProgress (rootFile, file, chunk) {
-      console.log(`上传中 ${file.name}，chunk：${chunk.startByte / 1024 / 1024} ~ ${chunk.endByte / 1024 / 1024}`)
+    complete () {
+      this.$message({
+        type: 'Info',
+        message: 'Upload success'
+      })
     },
-    onFileSuccess (rootFile, file, response, chunk) {
-      let res = JSON.parse(response)
-      console.log('hello', res)
-
-      // 服务器自定义的错误（即虽返回200，但是是错误的情况），这种错误是Uploader无法拦截的
-      if (!res.result) {
-        this.$message({ message: res.message, type: 'error' })
-        // 文件状态设为“失败”
-        this.statusSet(file.id, 'failed')
-        return
-      }
-      console.log('hello', res)
-      // 如果服务端返回需要合并
-      if (res.needMerge) {
-        // 文件状态设为“合并中”
-        this.statusSet(file.id, 'merging')
-        // 不需要合并
-      } else {
-        console.log('上传成功')
-      }
+    onFileComplete (rootFile) {
+      this.$axios({
+        url: '/server/data-service/merge',
+        method: 'post',
+        params: {
+          'identifier': rootFile.uniqueIdentifier,
+          'totalChunkNum': rootFile.chunks.length
+        }
+      }).then(function (response) {
+        console.log(response)
+      }).catch(function (error) {
+        console.log(error)
+      })
     },
     onFileError (rootFile, file, response, chunk) {
       this.$message({
@@ -115,74 +143,11 @@ export default {
         type: 'error'
       })
     },
-
-    /**
-       * 计算md5，实现断点续传及秒传
-       * @param file
-       */
-    computeMD5 (file) {
-      let fileReader = new FileReader()
-      let time = new Date().getTime()
-      let blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice
-      let currentChunk = 0
-      const chunkSize = 10 * 1024 * 1000
-      let chunks = Math.ceil(file.size / chunkSize)
-      let spark = new SparkMD5.ArrayBuffer()
-
-      // 文件状态设为"计算MD5"
-      this.statusSet(file.id, 'md5')
-      file.pause()
-
-      loadNext()
-
-      fileReader.onload = e => {
-        spark.append(e.target.result)
-
-        if (currentChunk < chunks) {
-          currentChunk++
-          loadNext()
-
-          // 实时展示MD5的计算进度
-          this.$nextTick(() => {
-            $(`.myStatus_${file.id}`).text('校验MD5 ' + ((currentChunk / chunks) * 100).toFixed(0) + '%')
-          })
-        } else {
-          let md5 = spark.end()
-          this.computeMD5Success(md5, file)
-          console.log(`MD5计算完毕：${file.name} \nMD5：${md5} \n分片：${chunks} 大小:${file.size} 用时：${new Date().getTime() - time} ms`)
-        }
-      }
-
-      fileReader.onerror = function () {
-        this.error(`文件${file.name}读取出错，请检查该文件`)
-        file.cancel()
-      }
-
-      function loadNext () {
-        let start = currentChunk * chunkSize
-        let end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize
-
-        fileReader.readAsArrayBuffer(blobSlice.call(file.file, start, end))
-      }
+    onFileProgress (rootFile, file, chunk) {
+      console.log(`Uploading ${file.name}, chunk: ${chunk.startByte / 1024 / 1024} ~ ${chunk.endByte / 1024 / 1024}`)
     },
-
-    computeMD5Success (md5, file) {
-      // 将自定义参数直接加载uploader实例的opts上
-      Object.assign(this.uploader.opts, {
-        query: {
-          ...this.params
-        }
-      })
-
-      file.uniqueIdentifier = md5
-      file.resume()
-      this.statusRemove(file.id)
-      console.log('he')
-    },
-
     fileListShow () {
       let $list = $('#global-uploader .file-list')
-
       if ($list.is(':visible')) {
         $list.slideUp()
         this.collapse = true
@@ -194,58 +159,11 @@ export default {
     close () {
       this.uploader.cancel()
       this.panelShow = false
-    },
-
-    /**
-       * 新增的自定义的状态: 'md5'、'transcoding'、'failed'
-       * @param id
-       * @param status
-       */
-    statusSet (id, status) {
-      let statusMap = {
-        md5: {
-          text: '校验MD5',
-          bgc: '#fff'
-        },
-        merging: {
-          text: '合并中',
-          bgc: '#e2eeff'
-        },
-        transcoding: {
-          text: '转码中',
-          bgc: '#e2eeff'
-        },
-        failed: {
-          text: '上传失败',
-          bgc: '#e2eeff'
-        }
-      }
-
-      this.$nextTick(() => {
-        $(`<p class="myStatus_${id}"></p>`).appendTo(`.file_${id} .uploader-file-status`).css({
-          'position': 'absolute',
-          'top': '0',
-          'left': '0',
-          'right': '0',
-          'bottom': '0',
-          'zIndex': '1',
-          'backgroundColor': statusMap[status].bgc
-        }).text(statusMap[status].text)
-      })
-    },
-    statusRemove (id) {
-      this.$nextTick(() => {
-        $(`.myStatus_${id}`).remove()
-      })
-    },
-
-    error (msg) {
-      this.$notify({
-        title: '错误',
-        message: msg,
-        type: 'error',
-        duration: 2000
-      })
+    }
+  },
+  computed: {
+    uploader () {
+      return this.$refs.uploader.uploader
     }
   }
 }
@@ -255,23 +173,19 @@ export default {
   #global-uploader {
     position: fixed;
     z-index: 20;
-    right: 15px;
-    bottom: 200px;
-
+    right: 0px;
+    bottom: 0px;
     .uploader-app {
-      width: 1000px;
+      width: 500px;
     }
-
     .file-panel {
       background-color: #fff;
       border: 1px solid #e2e2e2;
       border-radius: 7px 7px 0 0;
       box-shadow: 0 0 10px rgba(0, 0, 0, .2);
-
       .file-title {
         display: flex;
         border-bottom: 1px solid #ddd;
-
         .operate {
           text-align: center;
           vertical-align: middle;
@@ -281,26 +195,22 @@ export default {
           }
         }
       }
-
       .file-list {
         position: relative;
         height: 240px;
         overflow-x: hidden;
         overflow-y: auto;
         background-color: #fff;
-
         > li {
           background-color: #fff;
         }
       }
-
       &.collapse {
         .file-title {
           background-color: #E7ECF2;
         }
       }
     }
-
     .no-file {
       position: absolute;
       top: 50%;
@@ -308,12 +218,10 @@ export default {
       transform: translate(-50%, -50%);
       font-size: 16px;
     }
-
     /deep/.uploader-file-icon {
       &:before {
         content: '' !important;
       }
-
       &[icon=image] {
         background: url(../assets/images/icon/image-icon.png);
       }
@@ -324,15 +232,95 @@ export default {
         background: url(../assets/images/icon/text-icon.png);
       }
     }
-
     /deep/.uploader-file-actions > span {
       margin-right: 6px;
     }
   }
-
   /* 隐藏上传按钮 */
   #global-uploader-btn {
     position: absolute;
     clip: rect(0, 0, 0, 0);
+  }
+  label{
+    display:block;
+    vertical-align: middle;
+    margin-top: 1ch;
+  }
+  label, input, select{
+    vertical-align: middle;
+  }
+  .mui-switch {
+    width: 52px;
+    height: 31px;
+    position: relative;
+    border: 1px solid #dfdfdf;
+    background-color: #fdfdfd;
+    box-shadow: #dfdfdf 0 0 0 0 inset;
+    border-radius: 20px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background-clip: content-box;
+    display: inline-block;
+    -webkit-appearance: none;
+    user-select: none;
+    outline: none; }
+  .mui-switch:before {
+    content: '';
+    width: 29px;
+    height: 29px;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    border-radius: 20px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
+  .mui-switch:checked {
+    border-color: #64bd63;
+    box-shadow: #64bd63 0 0 0 16px inset;
+    background-color: #64bd63; }
+  .mui-switch:checked:before {
+    left: 21px; }
+  .mui-switch.mui-switch-animbg {
+    transition: background-color ease 0.4s; }
+  .mui-switch.mui-switch-animbg:before {
+    transition: left 0.3s; }
+  .mui-switch.mui-switch-animbg:checked {
+    box-shadow: #dfdfdf 0 0 0 0 inset;
+    background-color: #64bd63;
+    transition: border-color 0.4s, background-color ease 0.4s; }
+  .mui-switch.mui-switch-animbg:checked:before {
+    transition: left 0.3s; }
+  .mui-switch.mui-switch-anim {
+    transition: border cubic-bezier(0, 0, 0, 1) 0.4s, box-shadow cubic-bezier(0, 0, 0, 1) 0.4s; }
+  .mui-switch.mui-switch-anim:before {
+    transition: left 0.3s; }
+  .mui-switch.mui-switch-anim:checked {
+    box-shadow: #64bd63 0 0 0 16px inset;
+    background-color: #64bd63;
+    transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s; }
+  .mui-switch.mui-switch-anim:checked:before {
+    transition: left 0.3s; }
+  input{
+    border: 1px solid #ccc;
+    padding: 7px 0px;
+    border-radius: 3px;
+    padding-left:5px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s
+  }
+  input:focus{
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
   }
 </style>

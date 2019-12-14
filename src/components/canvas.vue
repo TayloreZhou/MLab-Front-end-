@@ -1,46 +1,45 @@
 <template>
-  <div v-loading="loading">
+  <el-row>
     <el-divider></el-divider>
-    <div id="PaletteAndDiagram">
-      <div class="tabber" @click="goBack"><i class="el-icon-back"/></div>
-      <div id="sideBar">
-        <div id="accordion">
-          <h4 @click="showPaletteLevel1">Input Layer</h4>
-          <div>
-            <div
-              id="myPaletteLevel1"
-              style="display:none"
-              class="myPaletteDiv"
-            ></div>
-          </div>
-          <h4 @click="showPaletteLevel2">Node layer</h4>
-          <div>
-            <div
-              id="myPaletteLevel2"
-              style="display:none"
-              class="myPaletteDiv"
-            ></div>
-          </div>
-          <h4 @click="showPaletteLevel3">Output Layer</h4>
-          <div>
-            <div
-              id="myPaletteLevel3"
-              style="display:none"
-              class="myPaletteDiv"
-            ></div>
+    <my-uploader ref="myUploaderAlpha"></my-uploader>
+    <el-row>
+      <el-col span="6">
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+          <el-form-item label="ModelName" prop="modelName">
+            <el-input v-model="ruleForm.modelName" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-col>
+      <el-col offset="14" span="2">
+        <el-button type="primary" @click="myUpload">File<i class="el-icon-upload el-icon--right"></i></el-button>
+      </el-col>
+      <el-col span="2">
+        <el-button @click="uploadModel('ruleForm')" type="primary">Model<i class="el-icon-upload el-icon--right"></i></el-button>
+      </el-col>
+    </el-row>
+    <el-row>
+      <div id="PaletteAndDiagram">
+        <div id="sideBar">
+          <div id="accordion">
+            <h4 @click="showPaletteLevel1">Input Layer</h4>
+            <div>
+              <div id="myPaletteLevel1" class="myPaletteDiv" ></div>
+            </div>
+            <h4 @click="showPaletteLevel2">Node layer</h4>
+            <div>
+              <div id="myPaletteLevel2" class="myPaletteDiv"></div>
+            </div>
+            <h4 @click="showPaletteLevel3">Output Layer</h4>
+            <div>
+              <div id="myPaletteLevel3" class="myPaletteDiv"></div>
+            </div>
           </div>
         </div>
+        <div id="myDiagramDiv"></div>
+        <div id="infoBar" class="inspector"></div>
       </div>
-      <div id="myDiagramDiv"></div>
-      <div id="infoBar" class="inspector"></div>
-      <div id="subbmitButton">
-        <el-button @click="commit" type="primary" round>commit</el-button>
-      </div>
-      <div style="position: fixed; right: 100px; top: 200px">
-        <el-button @click="myModel" ></el-button>
-      </div>
-    </div>
-  </div>
+    </el-row>
+  </el-row>
 </template>
 
 <script>
@@ -48,16 +47,56 @@ import go from 'gojs'
 import $ from 'jquery'
 import Inspector from '../assets/js/DataInspector'
 import '../assets/css/DataInspector.css'
+import {ACCEPT_CONFIG} from '../assets/js/config'
+import MyUploader from './uploader'
 const MAKE = go.GraphObject.make
 export default {
   name: 'canvas',
+  components: {MyUploader},
   data () {
+    var checkName = (rule, value, callback) => {
+      console.log(value)
+      if (!value) {
+        return callback(new Error('Username can\'t be empty'))
+      } else {
+        return callback()
+      }
+    }
     return {
-      stateP1: 0,
-      stateP2: 0,
-      stateP3: 0,
+      stateP1: 1,
+      stateP2: 1,
+      stateP3: 1,
       myDiagram: null,
-      loading: false
+      loading: false,
+      files: ['22'],
+      datasetName: ['sdad', 'ads', 'sadwwww'],
+      ruleForm: {
+        modelName: ''
+      },
+      rules: {
+        modelName: [
+          { validator: checkName, trigger: 'blur' }
+        ]
+      },
+      datasetId: 0,
+      options: {
+        target: '/server/data-service/chunk',
+        chunkSize: '20480',
+        maxChunkRetries: 1,
+        testChunks: true
+      },
+      attrs: {
+        accept: ACCEPT_CONFIG.getAll()
+      },
+      statusText: {
+        success: 'Success',
+        error: 'Error',
+        uploading: 'Uploading',
+        paused: 'Pause',
+        waiting: 'Waiting'
+      },
+      panelShow: false, // 选择文件后，展示上传panel
+      collapse: false
     }
   },
   mounted () {
@@ -294,17 +333,14 @@ export default {
       }) // 构建gojs对象
       console.log(mySelf.myDiagram)
       mySelf.myDiagram.addDiagramListener('ObjectSingleClicked', function (e) {
-        debugger
         console.log(e.subject.part)
       })
 
       mySelf.myDiagram.addDiagramListener('BackgroundSingleClicked', function (e) {
-        debugger
         console.log('Double-clicked at' + e.diagram.lastInput.documentPoint)
       })
 
       mySelf.myDiagram.addDiagramListener('ClipboardPasted', function (e) {
-        debugger
         console.log('Pasted' + e.diagram.selection.count + 'parts')
       })
 
@@ -338,29 +374,82 @@ export default {
       myModel.linkDataArray = []
       mySelf.myDiagram.model = myModel
       // eslint-disable-next-line no-unused-vars,no-undef
-      var inspector = new Inspector('infoBar', this.myDiagram, {
-        properties: {
-          // key would be automatically added for nodes, but we want to declare it read-only also:
-          // eslint-disable-next-line no-undef
-          key: { readOnly: true, show: Inspector.showIfPresent },
-          category: { readOnly: true, show: Inspector.showIfPresent },
-          name: { show: Inspector.showIfPresent },
-          InputCol: { show: Inspector.showIfPresent },
-          OutputCol: { show: Inspector.showIfPresent },
-          fileName: {
-            show: Inspector.showIfPresent,
-            type: 'select',
-            choices: function (node, propName) {
-              if (Array.isArray(node.data.choices)) return node.data.choices
-              return ['one', 'two', 'three', 'four', 'five']
+      var inspector = new Inspector('infoBar', this.myDiagram,
+        {
+          properties: {
+            // key would be automatically added for nodes, but we want to declare it read-only also:
+            // eslint-disable-next-line no-undef
+            'key': { readOnly: true, show: Inspector.showIfPresent },
+            'category': { readOnly: true, show: Inspector.showIfPresent },
+            'name': { show: Inspector.showIfPresent },
+            'InputCol': { show: Inspector.showIfPresent },
+            'OutputCol': { show: Inspector.showIfPresent },
+            'choices': {show: false},
+            'fileName': {
+              show: Inspector.showIfPresent,
+              type: 'select',
+              choices: function (node, propName) {
+                console.log('3222', node.data)
+                if (Array.isArray(node.data.choices)) return node.data.choices
+                return ['one', 'two', 'three']
+              }
             }
           }
-        }
-      })
-      this.init()
+        })
+      this.$axios.post('/boot/model')
+        .then((response) => {
+          console.log('1', this.files)
+          console.log('1', response.data)
+          this.files = []
+          for (var i = 0; i < response.data.length; i++) {
+            this.files.push(response.data[i])
+          }
+          this.init()
+          console.log('2', this.files)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     })
   },
   methods: {
+    uploadModel (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('submit!')
+          const h = this.$createElement
+          this.$msgbox({
+            title: '消息',
+            message: h('p', null, [
+              h('span', null, '内容可以是 '),
+              h('i', { style: 'color: teal' }, 'VNode')
+            ]),
+            showCancelButton: true,
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+          }).then(action => {
+            this.$message({
+              type: 'info',
+              message: 'action: ' + action
+            })
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    getFiles () {
+      this.$axios.post('/boot/model')
+        .then((response) => {
+          console.log('1', response.data)
+          this.files = Object.assign([], response.data)
+          console.log('2', this.files)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     init () {
       var myPaletteLevel1 = MAKE(go.Palette, 'myPaletteLevel1', {
         nodeTemplateMap: this.myDiagram.nodeTemplateMap,
@@ -392,7 +481,7 @@ export default {
         copiesArrays: true,
         copiesArrayObjects: true,
         nodeDataArray: [
-          { key: 101, category: 'Input', name: 'InputNode', fileName: '' }
+          {key: 101, category: 'Input', name: 'InputNode', fileName: '', choices: this.files}
         ]
       })
       myPaletteLevel2.model = MAKE(go.GraphLinksModel, {
@@ -501,6 +590,9 @@ export default {
         $('#myPaletteLevel3').slideUp()
         this.stateP3 = 0
       }
+    },
+    myUpload () {
+      this.$refs.myUploaderAlpha.myUpload()
     },
     myModel () {
       console.log(this.myDiagram.model.toJSON())

@@ -12,7 +12,7 @@
           <el-col :span=8
                   :offset=4>
             <div style="margin-top: 10px;">
-              <el-input placeholder="请输入内容"
+              <el-input placeholder="Please input something to search"
                         v-model="searchInput"
                         class="input-with-select">
                 <el-select v-model="select"
@@ -30,33 +30,41 @@
               </el-input>
             </div>
           </el-col>
-          <el-col :span=1>
-            <div style="margin-top: 15px">
-              <el-link href="/canvas">主页</el-link>
+          <el-col :span=2>
+            <div style="margin-top: 8px">
+              <el-button style="color: rgba(0,0,0,0.7)" type="text" @click="Canvas">Canvas</el-button>
             </div>
           </el-col>
-          <el-col :span=1>
-            <div style="margin-top: 15px">
-              <el-link href="/society">社区</el-link>
-            </div>
+          <el-col :span=4>
+            <el-dropdown style="margin-top: 18px">
+                <span class="el-dropdown-link">
+                  Community<i class="el-icon-arrow-down el-icon--right"></i>
+                </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item icon="el-icon-milk-tea"
+                                  @click.native="forum">Forum</el-dropdown-item>
+                <el-dropdown-item icon="el-icon-potato-strips"
+                                  @click.native="dSociety">DatasetSociety</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </el-col>
           <el-col :span=2>
             <div style="margin-top: 15px">
               <el-dropdown>
                 <span class="el-dropdown-link">
-                  我的信息<i class="el-icon-arrow-down el-icon--right"></i>
+                  Myself<i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item icon="el-icon-user"
-                                    @click.native="myInfo">我的信息</el-dropdown-item>
+                                    @click.native="myInfo">Profile</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-box"
-                                    @click.native="modeList">我的模型</el-dropdown-item>
+                                    @click.native="modeList">Models</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-s-order"
-                                    @click.native="myJob">训练列表</el-dropdown-item>
-                  <el-dropdown-item icon="el-icon-s-order"
-                                    @click.native="myPost">预测列表</el-dropdown-item>
+                                    @click.native="myJob">Jobs</el-dropdown-item>
+                  <el-dropdown-item icon="el-icon-s-comment"
+                                    @click.native="myPost">Posts</el-dropdown-item>
                   <el-dropdown-item icon="el-icon-close"
-                                    @click.native="logout">退出登录</el-dropdown-item>
+                                    @click.native="logout">Log out</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
@@ -111,13 +119,10 @@ export default {
   },
   methods: {
     myInfo () {
-      this.$router.push({ path: '/canvas' })
+      this.$router.push({ path: '/userDetail/info' })
     },
     logout () {
       this.$router.push({ path: '/login' })
-    },
-    myJob () {
-      this.$router.push({ path: '/joblist' })
     },
     search () {
       if (this.searchInput === '') {
@@ -135,6 +140,21 @@ export default {
           }
         })
       }
+    },
+    myJob () {
+      this.$router.push({ path: '/joblist/train' })
+    },
+    myPost () {
+      this.$router.push({ path: '/userDetail/posts' })
+    },
+    forum () {
+      this.$router.push({ path: '/society' })
+    },
+    dSociety () {
+      this.$router.push({ path: '/dCommunity' })
+    },
+    Canvas () {
+      this.$router.push({ path: '/canvas' })
     }
   }
 }
