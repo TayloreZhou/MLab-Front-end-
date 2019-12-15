@@ -28,14 +28,10 @@
       <el-form label-position="left"
                label-width="80px">
         <el-form-item label="UserName">
-          <el-input v-model="username"></el-input>
+            {{username}}
         </el-form-item>
         <el-form-item label="Email">
-          <el-input></el-input>
-        </el-form-item>
-        <el-form-item label="LikeNum"
-                      disabled>
-          <el-input></el-input>
+          <el-input v-model="email"></el-input>
         </el-form-item>
       </el-form>
       <el-button @click="handleSubmit">Submit</el-button>
@@ -49,6 +45,13 @@ export default {
   name: 'userInfo',
   components: { Avatar },
   mounted () {
+    this.$axios.get('/server/user-service/user/info/' + localStorage.getItem('username'))
+      .then((response) => {
+        console.log(response)
+        this.email = response.data.email
+      }).catch((error) => {
+        console.log(error)
+      })
   },
   computed: {
     getUsername () {
@@ -57,12 +60,29 @@ export default {
   },
   data () {
     return {
-      username: this.$store.getters.getUsername
+      username: localStorage.getItem('username'),
+      email: ''
     }
   },
   methods: {
     handleSubmit () {
-      console.log(this.$store.getters.getUsername)
+      this.$axios.post('/server/user-service/user/update', {
+        username: this.username,
+        oPassword: '',
+        password: '',
+        email: '',
+        avatarUrl: this.$refs.userInfoAvatar.imageUrl
+      }).then((response) => {
+        console.log(response)
+        this.$message(response.data.msg)
+        this.$axios.get('/server/user-service/user/info/' + localStorage.getItem('username'))
+          .then((response) => {
+            console.log(response)
+            this.email = response.data.email
+          }).catch((error) => {
+            console.log(error)
+          })
+      })
     }
   }
 }

@@ -111,6 +111,12 @@ export default {
     }
   },
   mounted () {
+    this.$axios.get('/server/user-service/avatar/' + localStorage.getItem('username'))
+      .then((response) => {
+        this.circleUrl = response.data
+      }).catch((error) => {
+        console.log(error)
+      })
     this.minHeight = document.documentElement.clientHeight - 170
     var that = this
     window.onresize = function () {
