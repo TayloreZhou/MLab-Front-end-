@@ -39,10 +39,11 @@ export default {
         url: '/image',
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': 'xTFGpSlN7c6kTofNWEATB2p2cB96BD18'
+          'Authorization': 'ZNtF4YN9va6lBsSKpg31PKlkOCZIcEsC'
         },
         data: formdata
       }).then((response) => {
+        console.log(response)
         if (response.data['success']) {
           this.$refs.mde.$img2Url(pos, response.data['data']['url'])
         } else {

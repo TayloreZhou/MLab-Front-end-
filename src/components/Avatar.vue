@@ -47,7 +47,7 @@ export default {
         url: '/image',
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': 'xTFGpSlN7c6kTofNWEATB2p2cB96BD18'
+          'Authorization': 'ZNtF4YN9va6lBsSKpg31PKlkOCZIcEsC'
         },
         data: formdata,
         onUploadProgress: progressEvent => {

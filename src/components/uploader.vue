@@ -113,13 +113,13 @@ export default {
       }).then(() => {
         var isP = false
         if (this.$refs.isPublic.value === 'on') {
-          isP = true
+          isP = 1
         }
         this.$axios({
           method: 'post',
           url: '/server/metadata-service/dataset',
           data: {
-            'username': this.$store.getters.getUsername,
+            'username': localStorage.getItem('username'),
             'datasetName': file.name.split('.')[0],
             'description': this.$refs.description.value,
             'format': file.name.split('.').pop(),

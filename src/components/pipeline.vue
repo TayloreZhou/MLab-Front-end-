@@ -46,7 +46,7 @@
                 </div>
                 <div>
                   <el-divider></el-divider>
-                  <el-link :href="'http://localhost:8085/model/download/'+username+'/pipeline/'+x.pipelineName+'.zip'"
+                  <el-link :href="'http://localhost:8086/model/download/'+username+'/pipeline/'+x.pipelineName+'.zip'"
                            target="_blank"
                            :underline="false"
                            style="padding: 5px">
@@ -99,7 +99,7 @@
                 </div>
                 <div>
                   <el-divider></el-divider>
-                  <el-link :href="'http://localhost:8085/model/download/'+username+'/pipeline/'+x.pipelineName+'.zip'"
+                  <el-link :href="'http://localhost:8086/model/download/'+username+'/pipeline/'+x.pipelineName+'.zip'"
                            target="_blank"
                            :underline="false"
                            style="padding: 5px">
@@ -144,7 +144,7 @@ export default {
       modelList: [],
       searchItem: '',
       searchList: [],
-      username: 'cyy',
+      username: localStorage.getItem("username"),
       loading: false
     }
   },
@@ -160,7 +160,7 @@ export default {
   mounted () {
     var that = this
     that.loading = true
-    that.$axios.get('/meta/pipeline/cyy').then(response => {
+    that.$axios.get('/server/metadata-service/pipeline/'+localStorage.getItem('username')).then(response => {
       that.$forceUpdate()
       console.log(response.data)
       var receiveTable = response.data
@@ -191,7 +191,7 @@ export default {
     },
     editModel (val) {
       var that = this
-      that.$axios.get('/boot/model/edit/' + val.pipelineId.toString()).then(
+      that.$axios.get('/server/model-service/model/edit/' + val.pipelineId.toString()).then(
         response => {
           var model = response.data.model
           console.log(JSON.stringify(model))

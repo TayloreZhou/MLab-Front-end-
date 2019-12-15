@@ -451,13 +451,13 @@ export default {
           }
         })
       console.log('hello')
-      this.$axios.post('/boot/model')
+      this.$axios.get('/server/metadata-service/datasetnp/'+localStorage.getItem('username'))
         .then((response) => {
           console.log('1', this.files)
           console.log('1', response.data)
           this.files = []
           for (var i = 0; i < response.data.length; i++) {
-            this.files.push(response.data[i])
+            this.files.push(response.data[i].datasetName+'.'+response.data[i].format)
           }
           this.init()
           console.log('2', this.files)
@@ -477,7 +477,7 @@ export default {
           this.$axios({
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
-            url: '/boot/model/generate/' + that.username + '/' + that.ruleForm.modelName + '?description=' + that.description,
+            url: '/server/model-service/model/generate/' + localStorage.getItem('username') + '/' + that.ruleForm.modelName + '?description=' + that.description,
             data: this.myDiagram.model.toJSON()
           }).then(response => {
             this.loading = false
