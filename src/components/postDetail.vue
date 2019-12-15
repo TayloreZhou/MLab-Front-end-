@@ -59,8 +59,7 @@
           </div>
           <div v-for="(item,i) in comments"
                :key="i"
-               class="author
-               -title reply-father">
+               class="author-title reply-father">
             <el-avatar class="header-img"
                        :size="40"
                        :src="item.avatarUrl"></el-avatar>
@@ -121,7 +120,7 @@
                 <div class="talk-box">
                   <p>
                     <span>回复 {{item.username}}:</span>
-                    <span class="reply">{{reply.content}}</span>
+                    <span v-html="reply.content" class="reply">{{reply.content}}</span>
                   </p>
                 </div>
                 <div class="reply-box">
@@ -471,7 +470,7 @@ export default {
             comment.replyInfo = {}
             this.comments.push(comment)
             this.checkCommentLike(i)
-            this.getReplies(1, 2, i)
+            this.getReplies(1, 2, this.comments.length - 1)
           }
           this.commentInfo.currentPage = response.data.pageNum
           this.commentInfo.hasNextPage = response.data.hasNextPage
