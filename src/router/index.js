@@ -27,7 +27,7 @@ import predictJobs from '../components/predictJobs'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -170,3 +170,26 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    if (to.name === 'login' || to.name === 'register') {
+      next()
+    } else {
+      next({
+        name: 'login'
+      })
+    }
+  } else {
+    if (to.name === 'login' || to.name === 'register') {
+      next({
+        name: '/'
+      })
+    } else {
+      next()
+    }
+  }
+})
+
+export default router
