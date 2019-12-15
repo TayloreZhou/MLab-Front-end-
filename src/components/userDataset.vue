@@ -1,58 +1,53 @@
 <template>
   <el-row>
-    <el-table
-      :data="dataset"
-      style="width: 100%">
-      <el-table-column
-        label="createTime"
-        width="200">
+    <el-table :data="dataset"
+              style="width: 100%">
+      <el-table-column label="createTime"
+                       width="200">
         <template slot-scope="scope">
           <i class="el-icon-time"></i>
           <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="datasetName"
-        width="180">
+      <el-table-column label="datasetName"
+                       width="180">
         <template slot-scope="scope">
-          <el-popover trigger="hover" placement="top">
+          <el-popover trigger="hover"
+                      placement="top">
             <p>datasetName: {{ scope.row.datasetName }}</p>
             <p>description: {{ scope.row.description }}</p>
-            <div slot="reference" class="name-wrapper">
+            <div slot="reference"
+                 class="name-wrapper">
               <el-tag size="medium">{{ scope.row.datasetName }}</el-tag>
             </div>
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column
-        label="public"
-        width="100">
+      <el-table-column label="public"
+                       width="100">
         <template slot-scope="scope">
-          <div slot="reference" class="name-wrapper">
+          <div slot="reference"
+               class="name-wrapper">
             <el-tag size="medium">{{ scope.row.isPublic === 1? 'yes' : 'no' }}</el-tag>
           </div>
         </template>
       </el-table-column>
-      <el-table-column
-        width="250">
-        <template slot="header" slot-scope="scope">
-          <el-input
-            v-model="search"
-            size="mini"
-            placeholder="Search keyword"/>
+      <el-table-column width="250">
+        <template slot="header"
+                  slot-scope="scope">
+          <el-input v-model="search"
+                    size="mini"
+                    placeholder="Search keyword" />
         </template>
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            @click="handleEdit(scope.$index, scope.row)">edit</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)">delete</el-button>
-          <el-button
-            size="mini"
-            type="success"
-            @click="handleDownload(scope.$index, scope.row)">download</el-button>
+          <el-button size="mini"
+                     @click="handleEdit(scope.$index, scope.row)">edit</el-button>
+          <el-button size="mini"
+                     type="danger"
+                     @click="handleDelete(scope.$index, scope.row)">delete</el-button>
+          <el-button size="mini"
+                     type="success"
+                     @click="handleDownload(scope.$index, scope.row)">download</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -61,8 +56,11 @@
                    :page-size="pageSize"
                    :page-count="pages"
                    :current-page.sync="currentPage"></el-pagination>
-    <el-dialog :title="datasetName" :visible.sync="dialogFormVisible">
-      <el-form ref="form" :model="form" label-width="80px">
+    <el-dialog :title="datasetName"
+               :visible.sync="dialogFormVisible">
+      <el-form ref="form"
+               :model="form"
+               label-width="80px">
         <el-form-item label="DatasetId">
           {{form.datasetId}}
         </el-form-item>
@@ -82,12 +80,15 @@
           <el-switch v-model="form.isPublic"></el-switch>
         </el-form-item>
         <el-form-item label="description">
-          <el-input type="textarea" v-model="form.description"></el-input>
+          <el-input type="textarea"
+                    v-model="form.description"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div slot="footer"
+           class="dialog-footer">
         <el-button @click="dialogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="handleSubmit()">Submit</el-button>
+        <el-button type="primary"
+                   @click="handleSubmit()">Submit</el-button>
       </div>
     </el-dialog>
   </el-row>
@@ -409,5 +410,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

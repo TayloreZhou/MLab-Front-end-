@@ -1,45 +1,82 @@
 <template>
-  <el-row>
-    <el-divider></el-divider>
-    <my-uploader ref="myUploaderAlpha"></my-uploader>
+  <div v-loading="loading">
+    <el-dialog title="Description"
+               :visible.sync="dialogVisible"
+               width="30%"
+               :before-close="handleClose">
+      <div class="item"
+           style="font-size: 16px; color: #606266;">Input description for model</div>
+      <div>
+        <el-input type="textarea"
+                  :rows="3"
+                  placeholder="input something"
+                  v-model="description"
+                  style="margin-top: 15px;">
+        </el-input>
+      </div>
+      <span slot="footer"
+            class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="uploadModel('ruleForm')">确 定</el-button>
+      </span>
+    </el-dialog>
     <el-row>
-      <el-col span="6">
-        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
-          <el-form-item label="ModelName" prop="modelName">
-            <el-input v-model="ruleForm.modelName" autocomplete="off"></el-input>
-          </el-form-item>
-        </el-form>
-      </el-col>
-      <el-col offset="14" span="2">
-        <el-button type="primary" @click="myUpload">File<i class="el-icon-upload el-icon--right"></i></el-button>
-      </el-col>
-      <el-col span="2">
-        <el-button @click="uploadModel('ruleForm')" type="primary">Model<i class="el-icon-upload el-icon--right"></i></el-button>
-      </el-col>
-    </el-row>
-    <el-row>
-      <div id="PaletteAndDiagram">
-        <div id="sideBar">
-          <div id="accordion">
-            <h4 @click="showPaletteLevel1">Input Layer</h4>
-            <div>
-              <div id="myPaletteLevel1" class="myPaletteDiv" ></div>
-            </div>
-            <h4 @click="showPaletteLevel2">Node layer</h4>
-            <div>
-              <div id="myPaletteLevel2" class="myPaletteDiv"></div>
-            </div>
-            <h4 @click="showPaletteLevel3">Output Layer</h4>
-            <div>
-              <div id="myPaletteLevel3" class="myPaletteDiv"></div>
+      <el-divider></el-divider>
+      <my-uploader ref="myUploaderAlpha"></my-uploader>
+      <el-row>
+        <el-col span="6">
+          <el-form :model="ruleForm"
+                   status-icon
+                   :rules="rules"
+                   ref="ruleForm"
+                   label-width="150px"
+                   class="demo-ruleForm">
+            <el-form-item label="ModelName"
+                          prop="modelName">
+              <el-input v-model="ruleForm.modelName"
+                        autocomplete="off"></el-input>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col offset="14"
+                span="2">
+          <el-button type="primary"
+                     @click="myUpload">File<i class="el-icon-upload el-icon--right"></i></el-button>
+        </el-col>
+        <el-col span="2">
+          <el-button @click="goDescription"
+                     type="primary">Model<i class="el-icon-upload el-icon--right"></i></el-button>
+        </el-col>
+      </el-row>
+      <el-row>
+        <div id="PaletteAndDiagram">
+          <div id="sideBar">
+            <div id="accordion">
+              <h4 @click="showPaletteLevel1">Input Layer</h4>
+              <div>
+                <div id="myPaletteLevel1"
+                     class="myPaletteDiv"></div>
+              </div>
+              <h4 @click="showPaletteLevel2">Node layer</h4>
+              <div>
+                <div id="myPaletteLevel2"
+                     class="myPaletteDiv"></div>
+              </div>
+              <h4 @click="showPaletteLevel3">Output Layer</h4>
+              <div>
+                <div id="myPaletteLevel3"
+                     class="myPaletteDiv"></div>
+              </div>
             </div>
           </div>
+          <div id="myDiagramDiv"></div>
+          <div id="infoBar"
+               class="inspector"></div>
         </div>
-        <div id="myDiagramDiv"></div>
-        <div id="infoBar" class="inspector"></div>
-      </div>
+      </el-row>
     </el-row>
-  </el-row>
+  </div>
 </template>
 
 <script>
@@ -47,12 +84,12 @@ import go from 'gojs'
 import $ from 'jquery'
 import Inspector from '../assets/js/DataInspector'
 import '../assets/css/DataInspector.css'
-import {ACCEPT_CONFIG} from '../assets/js/config'
+import { ACCEPT_CONFIG } from '../assets/js/config'
 import MyUploader from './uploader'
 const MAKE = go.GraphObject.make
 export default {
   name: 'canvas',
-  components: {MyUploader},
+  components: { MyUploader },
   data () {
     var checkName = (rule, value, callback) => {
       console.log(value)
@@ -96,7 +133,15 @@ export default {
         waiting: 'Waiting'
       },
       panelShow: false, // 选择文件后，展示上传panel
-      collapse: false
+      dialogVisible: false,
+      description: '',
+      collapse: false,
+      username: 'cyy'
+    }
+  },
+  watch: {
+    $route (to, from) {
+      this.$router.go(0)
     }
   },
   mounted () {
@@ -373,6 +418,12 @@ export default {
       myModel.nodeDataArray = []
       myModel.linkDataArray = []
       mySelf.myDiagram.model = myModel
+      var routerParams = this.$route.query.graph
+      console.log(routerParams)
+      if (routerParams !== undefined) {
+        this.myDiagram.model = go.Model.fromJson(JSON.parse(routerParams))
+      }
+      console.log(this.myDiagram.model.toJSON())
       // eslint-disable-next-line no-unused-vars,no-undef
       var inspector = new Inspector('infoBar', this.myDiagram,
         {
@@ -384,7 +435,10 @@ export default {
             'name': { show: Inspector.showIfPresent },
             'InputCol': { show: Inspector.showIfPresent },
             'OutputCol': { show: Inspector.showIfPresent },
-            'choices': {show: false},
+            'choices': { show: false },
+            'maxIter': { show: Inspector.showIfPresent },
+            'regParam': { show: Inspector.showIfPresent },
+            'numFeatures': { show: Inspector.showIfPresent },
             'fileName': {
               show: Inspector.showIfPresent,
               type: 'select',
@@ -414,23 +468,24 @@ export default {
   },
   methods: {
     uploadModel (formName) {
+      var that = this
+      console.log(this.myDiagram.model.toJSON())
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
-          const h = this.$createElement
-          this.$msgbox({
-            title: '消息',
-            message: h('p', null, [
-              h('span', null, '内容可以是 '),
-              h('i', { style: 'color: teal' }, 'VNode')
-            ]),
-            showCancelButton: true,
-            confirmButtonText: '确定',
-            cancelButtonText: '取消'
-          }).then(action => {
+          this.loading = true
+          this.$axios({
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            url: '/boot/model/generate/' + that.username + '/' + that.ruleForm.modelName + '?description=' + that.description,
+            data: this.myDiagram.model.toJSON()
+          }).then(response => {
+            this.loading = false
             this.$message({
-              type: 'info',
-              message: 'action: ' + action
+              message: '模型成功生成',
+              type: 'success'
+            })
+            this.$router.push({
+              path: '/modellist/pipeline'
             })
           })
         } else {
@@ -481,7 +536,7 @@ export default {
         copiesArrays: true,
         copiesArrayObjects: true,
         nodeDataArray: [
-          {key: 101, category: 'Input', name: 'InputNode', fileName: '', choices: this.files}
+          { key: 101, category: 'Input', name: 'InputNode', fileName: '', choices: this.files }
         ]
       })
       myPaletteLevel2.model = MAKE(go.GraphLinksModel, {
@@ -492,20 +547,23 @@ export default {
             key: 201,
             category: 'HashingTF',
             name: 'HashingTFNode',
-            InputCol: 3,
-            OutputCol: 3
+            numFeatures: 1000,
+            InputCol: 'a',
+            OutputCol: 'b'
           },
           {
             key: 202,
             category: 'LogisticRegression',
-            name: 'LogisticRegressionNode'
+            name: 'LogisticRegressionNode',
+            maxIter: 10,
+            regParam: 1.0
           },
           {
             key: 203,
             category: 'Tokenizer',
             name: 'TokenizerNode',
-            InputCol: 3,
-            OutputCol: 3
+            InputCol: 'a',
+            OutputCol: 'b'
           }
         ]
       })
@@ -563,7 +621,7 @@ export default {
       }
       return 0
     },
-    onSubmit () {},
+    onSubmit () { },
     showPaletteLevel1 () {
       if (this.stateP1 === 0) {
         $('#myPaletteLevel1').slideDown()
@@ -595,7 +653,6 @@ export default {
       this.$refs.myUploaderAlpha.myUpload()
     },
     myModel () {
-      console.log(this.myDiagram.model.toJSON())
       if (typeof WebSocket === 'undefined') {
         console.log('您的浏览器不支持WebSocket')
       } else {
@@ -623,9 +680,13 @@ export default {
       console.log('OK')
       this.loading = true
       this.$axios({
+        method: 'get',
+        url: 'userservice/user/info'
+      })
+      this.$axios({
         method: 'post',
-        headers: {'Content-Type': 'application/json'},
-        url: '/boot/api/model/generate/123/912?description=221',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/boot/api/model/generate/912?description=221',
         data: this.myDiagram.model.toJSON()
       }).then(response => {
         this.loading = false
@@ -640,7 +701,14 @@ export default {
     },
     goBack () {
       this.$router.go(-1)
+    },
+    goDescription () {
+      this.dialogVisible = true
+    },
+    getModel () {
+      console.log('ok')
     }
+
   }
 }
 </script>
@@ -720,5 +788,10 @@ figure {
 .tabber {
   font-size: 24px;
   text-align: left;
+}
+.text {
+  font-size: 12px;
+  text-align: left;
+  color: #606266;
 }
 </style>

@@ -20,6 +20,10 @@ import userPost from '../components/userPost'
 import userDataset from '../components/userDataset'
 import datasetCommunity from '../components/dataset_community/datasetCommunity'
 import datasetDetail from '../components/dataset_community/datasetDetail'
+import pipeline from '../components/pipeline'
+import trainingJobs from '../components/trainingJobs'
+import model from '../components/model'
+import predictJobs from '../components/predictJobs'
 
 Vue.use(Router)
 
@@ -106,7 +110,29 @@ export default new Router({
         {
           path: '/modellist',
           name: 'modelList',
-          component: modelList
+          component: modelList,
+          children: [
+            {
+              path: '/modellist/pipeline',
+              name: 'pipeline',
+              component: pipeline
+            },
+            {
+              path: '/modellist/train',
+              name: 'train',
+              component: trainingJobs
+            },
+            {
+              path: '/modellist/model',
+              name: 'model',
+              component: model
+            },
+            {
+              path: '/modellist/predict',
+              name: 'predict',
+              component: predictJobs
+            }
+          ]
         },
         {
           path: '/joblist',
