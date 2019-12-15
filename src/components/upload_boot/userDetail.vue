@@ -1,7 +1,7 @@
 <template>
   <el-row>
     <el-divider></el-divider>
-    <el-col span="6" offset="1">
+    <el-col :span="6" :offset="1">
       <el-row>
         <el-card>
           <div slot="header">
@@ -14,13 +14,10 @@
         <el-button type="text" @click="userInfo">Profile</el-button>
       </el-row>
       <el-row>
-        <el-button type="text" @click="posts">Post</el-button>
-      </el-row>
-      <el-row>
         <el-button type="text" @click="dataset">Dataset</el-button>
       </el-row>
     </el-col>
-    <el-col span="16" offset="1">
+    <el-col :span="16" :offset="1">
       <router-view></router-view>
     </el-col>
   </el-row>
@@ -32,9 +29,6 @@ export default {
   methods: {
     userInfo () {
       this.$router.push({ path: '/userDetail/info' })
-    },
-    posts () {
-      this.$router.push({ path: '/userDetail/posts' })
     },
     dataset () {
       this.$router.push({ path: '/userDetail/dataset' })

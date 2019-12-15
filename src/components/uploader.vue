@@ -26,12 +26,13 @@
              :class="{'collapse': collapse}">
           <div class="file-title">
             <el-row style="width: 100%">
-              <el-col span="5">
+              <el-col :span="5">
                 <p><strong>File List</strong></p>
               </el-col>
+
               <el-col class="operate"
-                      offset="14"
-                      span="5">
+                      :offset="14"
+                      :span="5">
                 <el-button style="margin-top: 10px"
                            :icon="collapse ? 'el-icon-arrow-up': 'el-icon-arrow-down'"
                            @click="fileListShow"

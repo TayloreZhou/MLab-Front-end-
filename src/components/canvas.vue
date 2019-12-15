@@ -450,6 +450,7 @@ export default {
             }
           }
         })
+      console.log('hello')
       this.$axios.post('/boot/model')
         .then((response) => {
           console.log('1', this.files)
@@ -495,7 +496,7 @@ export default {
       })
     },
     getFiles () {
-      this.$axios.post('/boot/model')
+      this.$axios.post('/meta/datasetnp/' + localStorage.getItem('username'))
         .then((response) => {
           console.log('1', response.data)
           this.files = Object.assign([], response.data)

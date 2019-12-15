@@ -2,21 +2,24 @@
   <div style="width: 1200px;margin: auto">
     <el-container>
       <el-row>
-        <el-col span="4" offset="1">
+        <el-col :span="4" :offset="1">
           <div><img src="../assets/185-43-hor.png" alt="MLab"/></div>
         </el-col>
-        <el-col span="2" offset="17">
+        <el-col :span="2" :offset="17">
           <div style="margin-top: 20px">
             <el-link href="/login" >Log In</el-link>
           </div>
         </el-col>
       </el-row>
       <el-divider content-position="right">Welcome to MLab!</el-divider>
-      <el-row type="flex" justify="center">
-        <el-col span="8" style="margin: 70px 0px">
+      <el-row>
+        <el-col :offset="5" :span="5">
+          <Avatar ref="registerAvatar" style="margin-top: 80px"></Avatar>
+        </el-col>
+        <el-col :span="8" :offset="2" style="margin: 70px 0px">
           <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="200px" class="demo-ruleForm">
             <el-form-item label="Username" prop="checkName">
-              <el-input v-model="ruleForm.username" autocomplete="off"></el-input>
+              <el-input v-model="ruleForm.checkName" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="Password" prop="pass">
               <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
@@ -25,7 +28,7 @@
               <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="email" prop="checkEmail">
-              <el-input v-model="ruleForm.email" autocomplete="off"></el-input>
+              <el-input v-model="ruleForm.checkEmail" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm('ruleForm')">Submit</el-button>
@@ -37,7 +40,7 @@
       <el-divider content-position="left">Welcome to MLab!</el-divider>
       <el-footer>
         <el-row type="flex" justify="center">
-          <el-col span="4" style="vertical-align: middle">
+          <el-col :span="4" style="vertical-align: middle">
             <div style="color: rgba(0,0,0,0.6);">
               Made In China
             </div>
@@ -52,8 +55,10 @@
 </template>
 
 <script>
+import Avatar from './Avatar'
 export default {
   name: 'register',
+  components: {Avatar},
   data () {
     var checkName = (rule, value, callback) => {
       if (!value) {
@@ -100,8 +105,8 @@ export default {
       ruleForm: {
         pass: '',
         checkPass: '',
-        name: '',
-        email: ''
+        checkName: '',
+        checkEmail: ''
       },
       rules: {
         pass: [
@@ -121,21 +126,30 @@ export default {
   },
   methods: {
     submitForm (formName) {
+      if (this.$refs['registerAvatar'].imageUrl === '') {
+        this.$message.error('No avatar!')
+        return false
+      }
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$confirm('Congratulation! You can click confirm button to link to Login page.', 'Login Successfully', {
-            confirmButtonText: 'Confirm',
-            type: 'success',
-            center: true
-          }).then(() => {
-            this.$router.push({ path: '/login' })
-          }).catch(() => {
+          this.$axios.post('/server/user-service/register', {
+            'username': this.ruleForm.username,
+            'password': this.ruleForm.password,
+            'email': this.ruleForm.email,
+            'avatarUrl': this.ruleForm.avatarUrl
+          }
+          ).then((response) => {
+            if (response.status === 200) {
+              this.$router.push('/login')
+            } else if (response.status === 409) {
+              this.$message.error('Username existed!')
+            } else {
+              this.$message.error('Register Error!')
+            }
           })
         } else {
-          this.$notify.error({
-            title: 'Error',
-            message: 'Please fix the error!'
-          })
+          this.$message.error('Reigster Error!')
+          return false
         }
       })
     },

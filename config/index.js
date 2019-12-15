@@ -44,6 +44,13 @@ module.exports = {
         pathRewrite: {
           "^/train": ""
         }
+      },
+      '/image': {
+        target: 'https://sm.ms/api/v2/upload',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/image': '/'
+        }
       }
     },
 

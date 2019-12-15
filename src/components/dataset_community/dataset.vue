@@ -7,7 +7,7 @@
         <div class="post-prview">
           <div>
             <img class="avatar"
-                 src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                 :src="imagePath"
                  alt="avatar">
             <a class="author">{{ datasetData.username }}</a>
           </div>
@@ -31,9 +31,15 @@ export default {
   props: ['datasetData'],
   data () {
     return {
+      imagePath: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
     }
   },
-  mounted: function () {
+  mounted () {
+    if (this.datasetData.avatarUrl === '') {
+      this.imagePath = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
+    } else {
+      this.imagePath = this.datasetData.avatarUrl
+    }
   },
   methods: {
     handlePostDetail () {

@@ -108,7 +108,7 @@
                            :src="reply.avatarUrl"></el-avatar>
                 <div class="author-info">
                   <span class="author-name">{{reply.username}}</span>
-                  <span class="author-time">{{reply.createTime}}</span>
+                  <span class="author-time">{{reply.createTime != '刚刚'?$moment(reply.createTime).format('YYYY-MM-DD HH:mm'):'刚刚'}}</span>
                 </div>
                 <div class="icon-btn">
                   <!-- reply不需要点赞与回复 -->
@@ -147,7 +147,6 @@
             <a>author: {{authorInfo.username}}</a></div>
           <div>
             <a>{{authorInfo.email}}</a></div>
-          <div><a>{{authorInfo.likeNum}} like</a></div>
         </el-card>
       </el-aside>
     </el-container>
@@ -243,13 +242,11 @@ export default {
       authorInfo: {
         username: 'hpy',
         email: 'EMAIL',
-        likeNum: 10000000,
         avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443788&di=95bd4d1f71ad1d8604bd3b190b15b3c5&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201902%2F19%2F20190219130018_wwfpe.jpg'
       },
       userInfo: {
-        username: 'jj',
+        username: 'admin',
         email: 'EMAIL',
-        likeNum: 100,
         avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443792&di=a59189a577729463ee4c42ccada26eb0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201802%2F27%2F20180227201208_ujwhc.jpeg'
       },
       commentFold: true
@@ -259,11 +256,20 @@ export default {
   created: function () {
     this.datasetId = this.$route.query.datasetId
     this.$axios
-      .get('/boot/post/' + this.datasetId)
+      .get('/server/metadata-service/datasetPostId/' + this.datasetId)
       .then(response => {
         this.datasetData = response.data
         this.author = response.data.username
         this.authorInfo.username = this.author
+        this.$axios
+          .get('/server/user-service/user/info/' + this.authorInfo.username)
+          .then(response => {
+            this.authorInfo.avatar = response.data.avatarUrl
+            this.authorInfo.email = response.data.email
+          })
+          .catch(error => {
+            console.log(error)
+          })
         this.getComments(1, this.commentInfo.pageSize)
       })
       .catch(error => {
@@ -313,13 +319,13 @@ export default {
         newComment.likeNum = 0
         newComment.content = this.commentInput
         newComment.inputShow = false
-        this.$axios.post('/boot/comment/publish', {
-          postId: this.datasetData.datasetId,
+        this.$axios.post('/server/dataset-service/publish', {
+          datasetId: this.datasetData.datasetId,
           username: this.userInfo.username,
           content: this.commentInput
         }).then(response => {
-          if (response.data > 0) {
-            newComment.dCommentId = response.data
+          if (response.data.data > 0) {
+            newComment.dCommentId = response.data.data
             newComment.replies = []
             this.comments.unshift(newComment)
             this.datasetData.commentNum++
@@ -340,13 +346,15 @@ export default {
       } else {
         // this.comments[i].reply.push(a)
         let newReply = {}
+        console.log(i)
+        console.log(this.comments)
         newReply.username = this.userInfo.username
         newReply.avatarUrl = this.userInfo.avatar
         newReply.createTime = '刚刚'
         newReply.content = this.replyInput
-        this.$axios.post('/boot/reply/publish', {
+        this.$axios.post('/server/dataset-service/dReply/publish', {
           username: this.userInfo.username,
-          dCommentId: this.comments[i].dCommentId,
+          dcommentId: this.comments[i].dcommentId,
           content: this.replyInput
         }).then(response => {
           if (response.data) {
@@ -399,10 +407,10 @@ export default {
     getComments (pageNum, pageSize) {
       // 请求评论
       this.$axios
-        .get('/boot/comment/get-comments-of-post/' + this.datasetData.datasetId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
+        .get('/server/dataset-service/comment/' + this.datasetData.datasetId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
         .then(response => {
-          console.log(response.data)
           // result为comment构成的列表
+          console.log('getComment', response.data.list)
           var result = []
           result = response.data.list
           for (var i = 0; i < result.length; i++) {
@@ -410,36 +418,36 @@ export default {
             comment.replies = []
             comment.replyInfo = {}
             this.comments.push(comment)
-            this.getReplies(1, 2, i)
+            this.getReplies(1, 2, this.comments.length - 1)
           }
           this.commentInfo.currentPage = response.data.pageNum
           this.commentInfo.hasNextPage = response.data.hasNextPage
           this.commentInfo.pageNum = response.data.size
         })
-      console.log('1234567')
-      console.log(this.comments)
     },
     getReplies (pageNum, pageSize, i) {
-      var comment = this.comments[i]
+      console.log(this.comments[i].dcommentId)
       this.$axios
-        .get('/boot/reply/get-replies-of-comment/' + comment.dCommentId + '?page-num=' + pageNum + '&&page-size=' + 2)
+        .get('/server/dataset-service/dReply/reply/' + this.comments[i].dcommentId + '?page-num=' + pageNum + '&&page-size=' + 2)
         .then(response => {
-          console.log('comment  ' + comment.commentId + ':' + response.data)
+          console.log(response)
           for (var re of response.data.list) {
             this.comments[i].replies.push(re)
           }
           this.comments[i].replyInfo.currentPage = response.data.pageNum
           this.comments[i].replyInfo.hasNextPage = response.data.hasNextPage
           this.comments[i].replyInfo.pageNum = response.data.size
+        }).catch((error) => {
+          console.log(error)
         })
     },
     changeCommentFold () {
       if (this.commentInfo.hasNextPage) {
+        console.log('true')
         this.getComments(this.commentInfo.currentPage + 1, this.commentInfo.pageSize)
       }
     },
     changeReplyFold (i) {
-      console.log('change' + i)
       var comment = this.comments[i]
       if (comment.replyInfo.hasNextPage) {
         this.getReplies(comment.replyInfo.currentPage + 1, 2, i)

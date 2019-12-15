@@ -11,7 +11,6 @@
               <el-radio-group v-model="radioOrder"
                               @change="handleRadioChange">
                 <el-radio-button label="latest">latest</el-radio-button>
-                <el-radio-button label="hot">hot</el-radio-button>
               </el-radio-group>
             </el-col>
           </el-row>
@@ -60,122 +59,11 @@ export default {
   data () {
     return {
       msg: '主页',
-      datasets: [
-        {
-          datasetId: 1,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 2,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 3,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 4,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 5,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 6,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 7,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 8,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 9,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        },
-        {
-          datasetId: 10,
-          username: 'admin',
-          datasetName: 'A dataset',
-          description: '这是一个传说中的数据集',
-          format: 'txt',
-          size: 123.0,
-          createTime: '2019-12-13 19:57:15',
-          isPublic: 1,
-          status: 1
-        }
-      ],
+      datasets: null,
       loading: true,
-      radioOrder: 'hot',
+      radioOrder: 'latest',
       pageSize: 10,
-      pages: 1,
+      pages: 0,
       currentPage: 1,
       pageshow: true
     }
@@ -183,6 +71,7 @@ export default {
   created: function () {
     // 默认获取最热信息
     this.getList(1)
+    this.getLatestList(this.currentPage)
   },
   methods: {
     handleRadioChange () {
@@ -201,30 +90,14 @@ export default {
       }
       console.log('get' + this.curretPage)
     },
-    getHotList (pageNum) {
-      // 获取热门主题下的信息
-      this.$axios
-        .get('/boot/post/get-order-by-like?page-num=' + pageNum + '&&page-size=' + this.pageSize)
-        .then(response => {
-          console.log('hot list\n')
-          console.log(response.data)
-          this.posts = response.data.list
-          this.loading = false
-          this.pages = response.data.pages
-          this.currentPage = response.data.pageNum
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
     getLatestList (pageNum) {
       // 获取最新主题下的信息
       this.$axios
-        .get('/boot/post/get-order-by-time?page-num=' + pageNum + '&&page-size=' + this.pageSize)
+        .get('/server/metadata-service/dataset_search/' + pageNum + '/' + this.pageSize)
         .then(response => {
           console.log('latest list\n')
           console.log(response.data)
-          this.posts = response.data.list
+          this.datasets = response.data.list
           this.loading = false
           this.pages = response.data.pages
           this.currentPage = response.data.pageNum
@@ -245,8 +118,7 @@ export default {
       console.log('新的url' + newURL)
     },
     handleCurrentChange (val) {
-      console.log('handle' + this.currentPage)
-      this.getList(val)
+      this.getLatestList(val)
     }
   }
 }
