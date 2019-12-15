@@ -11,7 +11,7 @@ import store from './store/store'
 import uploader from 'vue-simple-uploader'
 import moment from 'moment'
 
-process.env.Mock && require('./mock')
+// process.env.Mock && require('./mock.js')
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios

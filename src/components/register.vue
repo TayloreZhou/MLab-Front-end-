@@ -7,29 +7,26 @@
         </el-col>
         <el-col span="2" offset="17">
           <div style="margin-top: 20px">
-            <el-link href="/login" >Log In</el-link>
+            <el-link href="/login" >登录</el-link>
           </div>
         </el-col>
       </el-row>
       <el-divider content-position="right">Welcome to MLab!</el-divider>
       <el-row type="flex" justify="center">
-        <el-col span="8" style="margin: 70px 0px">
-          <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="200px" class="demo-ruleForm">
-            <el-form-item label="Username" prop="checkName">
-              <el-input v-model="ruleForm.username" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="Password" prop="pass">
+        <el-col span="6" style="margin: 70px 0px">
+          <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="密码" prop="pass">
               <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="Confirm Password" prop="checkPass">
+            <el-form-item label="确认密码" prop="checkPass">
               <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="email" prop="checkEmail">
-              <el-input v-model="ruleForm.email" autocomplete="off"></el-input>
+            <el-form-item label="年龄" prop="age">
+              <el-input v-model.number="ruleForm.age"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="submitForm('ruleForm')">Submit</el-button>
-              <el-button @click="resetForm('ruleForm')">Reset</el-button>
+              <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+              <el-button @click="resetForm('ruleForm')">重置</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -55,31 +52,25 @@
 export default {
   name: 'register',
   data () {
-    var checkName = (rule, value, callback) => {
+    var checkAge = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('Username can\'t be empty'))
-      } else {
-        return callback()
-      }
-    }
-    var checkEmail = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('Email can\'t be empty'))
+        return callback(new Error('年龄不能为空'))
       }
       setTimeout(() => {
-        // eslint-disable-next-line no-useless-escape
-        var reg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/
-        var isok = reg.test(value)
-        if (!isok) {
-          return callback(new Error('Email format error!'))
+        if (!Number.isInteger(value)) {
+          callback(new Error('请输入数字值'))
         } else {
-          return callback()
+          if (value < 18) {
+            callback(new Error('必须年满18岁'))
+          } else {
+            callback()
+          }
         }
       }, 1000)
     }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('Please input the password!'))
+        callback(new Error('请输入密码'))
       } else {
         if (this.ruleForm.checkPass !== '') {
           this.$refs.ruleForm.validateField('checkPass')
@@ -89,9 +80,9 @@ export default {
     }
     var validatePass2 = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('Please input the password again!'))
+        callback(new Error('请再次输入密码'))
       } else if (value !== this.ruleForm.pass) {
-        callback(new Error('Password don\'t match!'))
+        callback(new Error('两次输入密码不一致!'))
       } else {
         callback()
       }
@@ -100,8 +91,7 @@ export default {
       ruleForm: {
         pass: '',
         checkPass: '',
-        name: '',
-        email: ''
+        age: ''
       },
       rules: {
         pass: [
@@ -110,11 +100,8 @@ export default {
         checkPass: [
           { validator: validatePass2, trigger: 'blur' }
         ],
-        checkEmail: [
-          { validator: checkEmail, trigger: 'blur' }
-        ],
-        checkName: [
-          { validator: checkName, trigger: 'blur' }
+        age: [
+          { validator: checkAge, trigger: 'blur' }
         ]
       }
     }
@@ -123,19 +110,10 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$confirm('Congratulation! You can click confirm button to link to Login page.', 'Login Successfully', {
-            confirmButtonText: 'Confirm',
-            type: 'success',
-            center: true
-          }).then(() => {
-            this.$router.push({ path: '/login' })
-          }).catch(() => {
-          })
+          alert('submit!')
         } else {
-          this.$notify.error({
-            title: 'Error',
-            message: 'Please fix the error!'
-          })
+          console.log('error submit!!')
+          return false
         }
       })
     },

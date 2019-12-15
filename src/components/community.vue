@@ -67,25 +67,19 @@ export default {
       posts: {},
       loading: true,
       radioOrder: 'hot',
-      pageSize: 5,
+      pageSize: 10,
       pages: 1,
       currentPage: 1,
       pageshow: true,
-      searchInput: '\0'
+      searchInput: ''
     }
   },
   created: function () {
     // 默认获取最热信息
     this.searchInput = this.$route.query.searchInput
-    console.log(this.$route.query.searchInput)
+    console.log(this.searchInput)
     this.getList(1)
   },
-  watch: {
-    $route (to, from) {
-      this.$router.go(0)
-    }
-  },
-
   methods: {
     handleRadioChange () {
       this.currentPage = 1
@@ -105,11 +99,8 @@ export default {
     },
     getHotList (pageNum) {
       // 获取热门主题下的信息
-      console.log(this.searchInput + ' search')
       this.$axios
-        .post('/boot/post/search-order-by-like?page-num=' + pageNum + '&&page-size=' + this.pageSize, {
-          searchInput: typeof this.searchInput === 'undefined' ? '' : this.searchInput
-        })
+        .get('/boot/post/get-order-by-like?page-num=' + pageNum + '&&page-size=' + this.pageSize)
         .then(response => {
           console.log('hot list\n')
           console.log(response.data)
@@ -125,9 +116,7 @@ export default {
     getLatestList (pageNum) {
       // 获取最新主题下的信息
       this.$axios
-        .post('/boot/post/search-order-by-time?page-num=' + pageNum + '&&page-size=' + this.pageSize, {
-          searchInput: typeof this.searchInput === 'undefined' ? '' : this.searchInput
-        })
+        .get('/boot/post/get-order-by-time?page-num=' + pageNum + '&&page-size=' + this.pageSize)
         .then(response => {
           console.log('latest list\n')
           console.log(response.data)

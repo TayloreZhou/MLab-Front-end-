@@ -1,80 +1,63 @@
 <template>
-  <div>
-    <el-row>
-      <el-col span="4"
-              offset="1">
-        <div><img src="../assets/185-43-hor.png"
-               alt="MLab" /></div>
-      </el-col>
-    </el-row>
-    <el-divider></el-divider>
-    <el-row>
-      <div class="bg_log_in">
-        <el-row type="flex"
-                justify="center">
-          <el-col span="7"
-                  class="login_form">
-            <div style="width: 60%;margin: auto">
-              <el-form :model="ruleForm"
-                       status-icon
-                       :rules="rules"
-                       ref="ruleForm"
-                       class="demo-ruleForm"
-                       style="margin-top: 20px">
-                <el-form-item label="Username"
-                              prop="id">
-                  <el-input v-model.number="ruleForm.id"></el-input>
-                </el-form-item>
-                <el-form-item label="Password"
-                              prop="pass">
-                  <el-input type="password"
-                            v-model="ruleForm.pass"
-                            autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item>
-                  <el-row type="flex"
-                          justify="space-around">
-                    <el-col>
-                      <router-link to="/register">Sign In</router-link>
-                    </el-col>
-                    <el-col>
-                      <el-button type="primary"
-                                 @click="submitForm('ruleForm')">Login</el-button>
-                    </el-col>
-                    <el-col>
-                      <el-button @click="resetForm('ruleForm')">Reset</el-button>
-                    </el-col>
-                  </el-row>
-                </el-form-item>
-                <el-form-item>
-                  <el-row type="flex"
-                          justify="space-around">
-                    <el-col>
-                      <a href="">Forget password?</a>
-                    </el-col>
-                  </el-row>
-                </el-form-item>
-              </el-form>
+    <div>
+      <el-row>
+        <el-col span="4" offset="1">
+          <div><img src="../assets/185-43-hor.png" alt="MLab"/></div>
+        </el-col>
+      </el-row>
+      <el-divider></el-divider>
+      <el-row>
+        <div class="bg_log_in">
+          <el-row type="flex" justify="center">
+            <el-col span="7" class="login_form">
+              <div style="width: 60%;margin: auto">
+                <el-form :model="ruleForm" status-icon :rules="rules"
+                         ref="ruleForm" class="demo-ruleForm" style="margin-top: 20px">
+                  <el-form-item label="账号" prop="id">
+                    <el-input v-model.number="ruleForm.id"></el-input>
+                  </el-form-item>
+                  <el-form-item label="密码" prop="pass">
+                    <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-row type="flex" justify="space-around">
+                      <el-col>
+                        <router-link to="/register">注册</router-link>
+                      </el-col>
+                      <el-col>
+                        <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+                      </el-col>
+                      <el-col>
+                        <el-button @click="resetForm('ruleForm')">重置</el-button>
+                      </el-col>
+                    </el-row>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-row type="flex" justify="space-around">
+                      <el-col>
+                        <a href="">忘记密码</a>
+                      </el-col>
+                    </el-row>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+      </el-row>
+      <el-footer>
+        <el-row type="flex" justify="center">
+          <el-col span="4" style="vertical-align: middle">
+            <div style="color: rgba(0,0,0,0.6);">
+              Made In China
+            </div>
+            <div style="color: rgba(0,0,0,0.6);">
+              CopyRight© 2019 2 30
             </div>
           </el-col>
         </el-row>
-      </div>
-    </el-row>
-    <el-footer>
-      <el-row type="flex"
-              justify="center">
-        <el-col span="4"
-                style="vertical-align: middle">
-          <div style="color: rgba(0,0,0,0.6);">
-            Made In China
-          </div>
-          <div style="color: rgba(0,0,0,0.6);">
-            CopyRight© 2019 2 30
-          </div>
-        </el-col>
-      </el-row>
-    </el-footer>
-  </div>
+      </el-footer>
+    </div>
 </template>
 
 <script>
@@ -83,11 +66,11 @@ export default {
   data () {
     var checkId = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('Username can\'t be empty!'))
+        return callback(new Error('账号不能为空'))
       }
       setTimeout(() => {
         if (!Number.isInteger(value)) {
-          callback(new Error('Should be a number'))
+          callback(new Error('请输入数字值'))
         } else {
           callback()
         }
@@ -95,7 +78,7 @@ export default {
     }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('Password can\'t be empty!'))
+        callback(new Error('请输入密码'))
       } else {
         if (this.ruleForm.checkPass !== '') {
           this.$refs.ruleForm.validateField('checkPass')
@@ -128,19 +111,19 @@ export default {
               console.log('su')
               this.posts = response.data
               if (this.posts.state === 1) {
-                this.$router.push({ path: './canvas' })
+                this.$router.push({path: './canvas'})
               } else {
                 this.$notify.error({
-                  title: 'Error',
-                  message: 'Password incorrect!'
+                  title: '错误',
+                  message: '密码错误'
                 })
               }
             })
             .catch((error) => {
               console.log(error)
               this.$notify.error({
-                title: 'error',
-                message: 'Login failure!'
+                title: '错误',
+                message: '登录失败'
               })
             })
         } else {
@@ -156,17 +139,17 @@ export default {
 </script>
 
 <style scoped>
-.bg_log_in {
+.bg_log_in{
   background: url("../assets/bg_login.jpg") no-repeat;
   background-size: cover;
-  height: 800px;
+  height: 500px;
 }
-.login_form {
+.login_form{
   background: rgba(255, 255, 255, 0.75);
   text-align: center;
-  margin-top: 200px;
+  margin-top: 90px;
 }
-.text_foot {
+.text_foot{
   color: #000000;
   margin-top: 30px;
 }

@@ -7,7 +7,7 @@
         <div class="post-prview">
           <div>
             <img class="avatar"
-                 :src="postData.avatarUrl"
+                 src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
                  alt="avatar">
             <a class="author">{{ postData.username }}</a>
           </div>
@@ -64,10 +64,9 @@ a {
   position: relative;
 }
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   float: left;
-  border-radius: 50%;
 }
 .post-title {
   width: 85%;
