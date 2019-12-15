@@ -32,14 +32,16 @@
           </el-col>
           <el-col :span=2>
             <div style="margin-top: 8px">
-              <el-button style="color: rgba(0,0,0,0.7)" type="text" @click="Canvas">Canvas</el-button>
+              <el-button style="color: rgba(0,0,0,0.7)"
+                         type="text"
+                         @click="Canvas">Canvas</el-button>
             </div>
           </el-col>
           <el-col :span=3>
             <el-dropdown style="margin-top: 18px">
-                <span class="el-dropdown-link">
-                  Community<i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
+              <span class="el-dropdown-link">
+                Community<i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item icon="el-icon-milk-tea"
                                   @click.native="forum">Forum</el-dropdown-item>
