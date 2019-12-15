@@ -1,6 +1,6 @@
 <template>
   <el-row style="margin-top: 40px">
-    <el-col span="1" :height="300">
+    <el-col :span="1" :height="300">
       <el-divider direction="vertical"></el-divider>
       <el-divider direction="vertical"></el-divider>
       <el-divider direction="vertical"></el-divider>
@@ -16,10 +16,10 @@
       <el-divider direction="vertical"></el-divider>
       <el-divider direction="vertical"></el-divider>
     </el-col>
-    <el-col offset="3" span="4">
+    <el-col :offset="3" :span="4">
       <avatar ref="userInfoAvatar"></avatar>
     </el-col>
-    <el-col span="8" offset="6" style="margin-top: 40px">
+    <el-col :span="8" :offset="6" style="margin-top: 40px">
       <el-form label-position="left" label-width="80px">
         <el-form-item label="UserName">
           <el-input v-model="username"></el-input>

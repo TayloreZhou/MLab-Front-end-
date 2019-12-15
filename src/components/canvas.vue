@@ -3,17 +3,17 @@
     <el-divider></el-divider>
     <my-uploader ref="myUploaderAlpha"></my-uploader>
     <el-row>
-      <el-col span="6">
+      <el-col :span="6">
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
           <el-form-item label="ModelName" prop="modelName">
             <el-input v-model="ruleForm.modelName" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
       </el-col>
-      <el-col offset="14" span="2">
+      <el-col :offset="14" :span="2">
         <el-button type="primary" @click="myUpload">File<i class="el-icon-upload el-icon--right"></i></el-button>
       </el-col>
-      <el-col span="2">
+      <el-col :span="2">
         <el-button @click="uploadModel('ruleForm')" type="primary">Model<i class="el-icon-upload el-icon--right"></i></el-button>
       </el-col>
     </el-row>

@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-row>
-      <el-col span="4"
-              offset="1">
+      <el-col :span="4"
+              :offset="1">
         <div><img src="../assets/185-43-hor.png"
                alt="MLab" /></div>
       </el-col>
@@ -12,7 +12,7 @@
       <div class="bg_log_in">
         <el-row type="flex"
                 justify="center">
-          <el-col span="7"
+          <el-col :span="7"
                   class="login_form">
             <div style="width: 60%;margin: auto">
               <el-form :model="ruleForm"
@@ -63,7 +63,7 @@
     <el-footer>
       <el-row type="flex"
               justify="center">
-        <el-col span="4"
+        <el-col :span="4"
                 style="vertical-align: middle">
           <div style="color: rgba(0,0,0,0.6);">
             Made In China

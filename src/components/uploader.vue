@@ -19,10 +19,10 @@
         <div class="file-panel" slot-scope="props" :class="{'collapse': collapse}">
           <div class="file-title">
             <el-row style="width: 100%">
-              <el-col span="5">
+              <el-col :span="5">
                 <p><strong>File List</strong></p>
               </el-col>
-              <el-col class="operate" offset="14" span="5">
+              <el-col class="operate" :offset="14" :span="5">
                   <el-button style="margin-top: 10px" :icon="collapse ? 'el-icon-arrow-up': 'el-icon-arrow-down'" @click="fileListShow" type="text" :title="collapse ? '展开':'折叠' ">
                   </el-button>
                   <el-button style="margin-top: 10px" @click="close" type="text" title="关闭" icon="el-icon-close">
