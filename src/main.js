@@ -22,6 +22,40 @@ Vue.prototype.$moment = moment
 Vue.use(ElementUI, { locale })
 Vue.use(uploader)
 Vue.use(mavonEditor)
+
+axios.interceptors.request.use(
+  config => {
+    const token = store.state.token
+    if (token) {
+      config.headers.Authorization = 'Bearer ' + token
+    }
+    return config
+  },
+  error => {
+    console.log('err')
+    return Promise.reject(error)
+  }
+)
+
+axios.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          this.$store.commit('del_token')
+          router.replace({
+            path: '/login',
+            query: { redirect: router.currentRoute.fullPath }
+          })
+      }
+    }
+    return Promise.reject(error.response.data)
+  }
+)
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

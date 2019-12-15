@@ -10,13 +10,6 @@ module.exports = {
     assetsSubDirectory: "static",
     assetsPublicPath: "/",
     proxyTable: {
-      "/api": {
-        target: "https://www.v2ex.com",
-        changeOrigin: true,
-        pathRewrite: {
-          "^/api": "/api"
-        }
-      },
       "/server": {
         target: "http://localhost:8070",
         changeOrigin: true,

@@ -133,10 +133,10 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.$axios.post('/server/user-service/register', {
-            'username': this.ruleForm.username,
-            'password': this.ruleForm.password,
-            'email': this.ruleForm.email,
-            'avatarUrl': this.ruleForm.avatarUrl
+            'username': this.ruleForm.checkName,
+            'password': this.ruleForm.pass,
+            'email': this.ruleForm.checkEmail,
+            'avatarUrl': this.$refs['registerAvatar'].imageUrl
           }
           ).then((response) => {
             if (response.status === 200) {

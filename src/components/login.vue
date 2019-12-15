@@ -35,7 +35,7 @@
                   <el-row type="flex"
                           justify="space-around">
                     <el-col>
-                      <router-link to="/register">Sign In</router-link>
+                      <router-link to="/register">Sign up</router-link>
                     </el-col>
                     <el-col>
                       <el-button type="primary"
@@ -85,13 +85,7 @@ export default {
       if (!value) {
         return callback(new Error('Username can\'t be empty!'))
       }
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error('Should be a number'))
-        } else {
-          callback()
-        }
-      }, 1000)
+      callback()
     }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
@@ -131,6 +125,7 @@ export default {
               'Authorization': 'Basic YnJvd3NlcjpzZWNyZXQ='
             }
           }).then((response) => {
+            console.log(response)
             if (response.status === 200) {
               this.$store.commit('set_token', response.data.access_token)
               this.$store.commit('set_username', this.ruleForm.id)
