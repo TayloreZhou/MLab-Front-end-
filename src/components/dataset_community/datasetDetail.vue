@@ -14,18 +14,16 @@
               <a class="author">{{authorInfo.username}}</a>
             </div>
             <div class="post-detail">
-              <a class="post-title">{{postData.title}}</a>
-              <a class="post-description">{{$moment(postData.createTime).format('YYYY-MM-DD HH:mm')}}</a>
-              <p class="post-content">{{postData.content}}</p>
+              <a class="post-title">{{datasetData.datasetName}}</a>
+              <a class="post-description">{{$moment(datasetData.createTime).format('YYYY-MM-DD HH:mm')}}</a>
+              <p class="post-content">{{datasetData.description}}</p>
             </div>
             <div>
-              <i class="icon-btn el-icon-s-comment"
-                 style="float:right; padding-top:4px">{{postData.commentNum}}</i>
-              <el-button icon="el-icon-caret-top"
+              <a class="comment-num">Size:{{datasetData.size}} B</a>
+              <el-button icon="el-icon-download"
                          :type="likeType"
-                         size="mini"
-                         @click="handlePostLike"
-                         class="like-button">{{postData.likeNum}} </el-button>
+                         @click="handleDownload"
+                         class="like-button">{{datasetData.format}} </el-button>
             </div>
             <div>
             </div>
@@ -43,7 +41,7 @@
                    contenteditable="true"
                    id="commentInput"
                    spellcheck="false"
-                   placeholder="Input a comment..."
+                   placeholder="输入评论..."
                    class="reply-input"
                    @focus="showReplyBtn"
                    @input="onDivInput($event)">
@@ -54,26 +52,23 @@
               <el-button class="reply-btn"
                          size="medium"
                          @click="sendComment"
-                         type="primary">Publish!</el-button>
+                         type="primary">发表评论</el-button>
             </div>
           </div>
           <div v-for="(item,i) in comments"
                :key="i"
-               class="author
-               -title reply-father">
+               class="author-title reply-father">
             <el-avatar class="header-img"
                        :size="40"
                        :src="item.avatarUrl"></el-avatar>
             <div class="author-info">
               <span class="author-name">{{item.username}}</span>
               <span class="author-time">
-                {{item.createTime != 'just a minute'?$moment(item.createTime).format('YYYY-MM-DD HH:mm'):'just a minute'}}</span>
+                {{item.createTime != '刚刚'?$moment(item.createTime).format('YYYY-MM-DD HH:mm'):'刚刚'}}</span>
             </div>
             <div class="icon-btn">
               <span @click="showReplyInput(i)"><i class="iconfont el-icon-s-comment"></i>{{item.replyNum}}</span>
-              <span name="like"
-                    @click="handleLikeComment(i)"><i class="iconfont el-icon-caret-top"
-                   type="primary"></i>{{item.likeNum}}</span>
+              <i class="iconfont el-icon-caret-top"></i>{{item.likeNum}}
             </div>
             <div class="talk-box">
               <p>
@@ -135,7 +130,7 @@
             </div>
 
           </div>
-          <div v-if="postData.commentNum > 2"
+          <div v-if="datasetData.commentNum > 2"
                v-on:click="changeCommentFold">
             <el-link type="primary"
                      :disabled="!commentInfo.hasNextPage">{{commentInfo.hasNextPage?'展开更多评论 ↓':'没有更多评论了'}}</el-link>
@@ -191,15 +186,51 @@ export default {
       btnShow: false,
       index: '0',
       commentInput: '',
-      likeStyle: 'iconfont el-icon-caret-top',
       replyInput: '',
       myName: 'Lana Del Rey',
       myId: 19870621,
       to: '',
       toId: -1,
-      comments: [],
-      postId: '',
-      postData: {},
+      comments: [
+        // {
+        //   username: 'Lana Del Rey',
+        //   commentId: 19870621,
+        //   avatarUrl: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
+        //   content: '我发布一张新专辑Norman Fucking Rockwell,大家快来听啊',
+        //   createTime: '2019年9月16日 18:43',
+        //   replyNum: 2,
+        //   likeNum: 15,
+        //   inputShow: false
+        //   // reply: [
+        //   //   {
+        //   //     from: 'Taylor Swift',
+        //   //     fromId: 19891221,
+        //   //     fromHeadImg: 'https://ae01.alicdn.com/kf/H94c78935ffa64e7e977544d19ecebf06L.jpg',
+        //   //     to: 'Lana Del Rey',
+        //   //     toId: 19870621,
+        //   //     comment: '我很喜欢你的新专辑！！',
+        //   //     time: '2019年9月16日 18:43',
+        //   //     commentNum: 1,
+        //   //     like: 15,
+        //   //     inputShow: false
+        //   //   },
+        //   //   {
+        //   //     from: 'Ariana Grande',
+        //   //     fromId: 1123,
+        //   //     fromHeadImg: 'https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg',
+        //   //     to: 'Lana Del Rey',
+        //   //     toId: 19870621,
+        //   //     comment: '别忘记宣传我们的合作单曲啊',
+        //   //     time: '2019年9月16日 18:43',
+        //   //     commentNum: 0,
+        //   //     like: 5,
+        //   //     inputShow: false
+        //   //   }
+        //   // ]
+        // }
+      ],
+      datasetId: '',
+      datasetData: {},
       likeIcon: 'el-icon-star-off',
       likeType: 'primary',
       author: '',
@@ -213,30 +244,26 @@ export default {
         username: 'hpy',
         email: 'EMAIL',
         likeNum: 10000000,
-        avatar: ''
+        avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443788&di=95bd4d1f71ad1d8604bd3b190b15b3c5&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201902%2F19%2F20190219130018_wwfpe.jpg'
       },
       userInfo: {
         username: 'jj',
         email: 'EMAIL',
         likeNum: 100,
         avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443792&di=a59189a577729463ee4c42ccada26eb0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201802%2F27%2F20180227201208_ujwhc.jpeg'
-
       },
       commentFold: true
     }
   },
   directives: { clickoutside },
   created: function () {
-    this.postId = this.$route.query.postId
+    this.datasetId = this.$route.query.datasetId
     this.$axios
-      .get('/boot/post/' + this.postId)
+      .get('/boot/post/' + this.datasetId)
       .then(response => {
-        this.postData = response.data
-        this.postLikeNum = response.data.likeNum
+        this.datasetData = response.data
         this.author = response.data.username
         this.authorInfo.username = this.author
-        this.authorInfo.avatar = response.data.avatarUrl
-        this.checkPostLike()
         this.getComments(1, this.commentInfo.pageSize)
       })
       .catch(error => {
@@ -275,28 +302,27 @@ export default {
         this.$message({
           showClose: true,
           type: 'warning',
-          message: 'Comment cannot be empty!'
+          message: '评论不能为空'
         })
       } else {
         let newComment = {}
         newComment.username = this.userInfo.username
         newComment.avatarUrl = this.userInfo.avatar
-        newComment.createTime = 'just a minute'
+        newComment.createTime = '刚刚'
         newComment.replyNum = 0
         newComment.likeNum = 0
         newComment.content = this.commentInput
         newComment.inputShow = false
         this.$axios.post('/boot/comment/publish', {
-          postId: this.postData.postId,
+          postId: this.datasetData.datasetId,
           username: this.userInfo.username,
           content: this.commentInput
         }).then(response => {
           if (response.data > 0) {
-            newComment.commentId = response.data
+            newComment.dCommentId = response.data
             newComment.replies = []
-            newComment.likeStatus = false
             this.comments.unshift(newComment)
-            this.postData.commentNum++
+            this.datasetData.commentNum++
           }
         })
         let input = document.getElementById('commentInput')
@@ -309,18 +335,18 @@ export default {
         this.$message({
           showClose: true,
           type: 'warning',
-          message: 'Reply cannot be empty'
+          message: '回复不能为空'
         })
       } else {
         // this.comments[i].reply.push(a)
         let newReply = {}
         newReply.username = this.userInfo.username
         newReply.avatarUrl = this.userInfo.avatar
-        newReply.createTime = 'just a minute'
+        newReply.createTime = '刚刚'
         newReply.content = this.replyInput
         this.$axios.post('/boot/reply/publish', {
           username: this.userInfo.username,
-          commentId: this.comments[i].commentId,
+          dCommentId: this.comments[i].dCommentId,
           content: this.replyInput
         }).then(response => {
           if (response.data) {
@@ -367,99 +393,13 @@ export default {
         return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
       }
     },
-    checkPostLike () {
-      this.$axios
-        .get('/boot/like/check?user=' + this.author + '&&type=0&&type-id=' + this.postId)
-        .then(response => {
-          if (response.data === true) {
-            this.likeType = 'primary'
-          } else {
-            this.likeType = ''
-          }
-        })
-    },
-    checkCommentLike (i) {
-      this.$axios
-        .get('/boot/like/check?user=' + this.userInfo.username + '&&type=1&&type-id=' + this.comments[i].commentId)
-        .then(response => {
-          this.comments[i].likeStatus = response.data
-          document.getElementsByName('like')[i].style.color = response.data ? '#3293ee' : ''
-        })
-    },
-    handlePostLike () {
-      if (this.likeType === '') {
-        this.$axios.post('/boot/like/post', {
-          username: this.author,
-          typeId: this.postId,
-          likedUsername: this.author
-        }).then(response => {
-          console.response()
-        }).catch(error => {
-          console.log(error)
-        })
-      } else if (this.likeType === 'primary') {
-        this.$axios.post('/boot/unlike/post', {
-          username: this.author,
-          type: 0,
-          typeId: this.postId,
-          likedUsername: this.author
-        }).then(response => {
-          console.log(response)
-        }).catch(error => {
-          console.log(error)
-        })
-      }
-      this.$axios
-        .get('/boot/post/' + this.postId)
-        .then(response => {
-          console.log('post data\n')
-          console.log(response.data)
-          this.$set(this.postData, 'likeNum', response.data.likeNum)
-          this.checkPostLike()
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-    handleLikeComment (i) {
-      if (this.comments[i].likeStatus === false) {
-        this.$axios.post('/boot/like/comment', {
-          username: this.userInfo.username,
-          typeId: this.comments[i].commentId
-        }).then(response => {
-          console.log(response)
-          this.checkCommentLike(i)
-          if (response.data) {
-            this.$set(this.comments[i], 'likeNum', this.comments[i].likeNum + 1)
-          }
-        }).catch(error => {
-          console.log(error)
-        })
-      } else if (this.comments[i].likeStatus === true) {
-        this.$axios.post('/boot/unlike/comment', {
-          username: this.userInfo.username,
-          typeId: this.comments[i].commentId
-        }).then(response => {
-          this.checkCommentLike(i)
-          if (response.data) {
-            this.$set(this.comments[i], 'likeNum', this.comments[i].likeNum - 1)
-          }
-        }).catch(error => {
-          console.log(error)
-        })
-      }
-      var like = document.getElementsByName('like')[i]
-      like.style.color = '#3293ee'
-      // this.$axios.post
-      // if (document.getElementById('like')[i].hasClass('el-icon-caret-top')) {
-      //   document.getElementById('like')[i].classList.remove('el-icon-caret-top')
-      //   document.getElementById('like')[i].classList.add('el-icon-caret-top')
-      // }
+    handleDownload () {
+
     },
     getComments (pageNum, pageSize) {
       // 请求评论
       this.$axios
-        .get('/boot/comment/get-comments-of-post/' + this.postData.postId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
+        .get('/boot/comment/get-comments-of-post/' + this.datasetData.datasetId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
         .then(response => {
           console.log(response.data)
           // result为comment构成的列表
@@ -470,7 +410,6 @@ export default {
             comment.replies = []
             comment.replyInfo = {}
             this.comments.push(comment)
-            this.checkCommentLike(i)
             this.getReplies(1, 2, i)
           }
           this.commentInfo.currentPage = response.data.pageNum
@@ -483,7 +422,7 @@ export default {
     getReplies (pageNum, pageSize, i) {
       var comment = this.comments[i]
       this.$axios
-        .get('/boot/reply/get-replies-of-comment/' + comment.commentId + '?page-num=' + pageNum + '&&page-size=' + 2)
+        .get('/boot/reply/get-replies-of-comment/' + comment.dCommentId + '?page-num=' + pageNum + '&&page-size=' + 2)
         .then(response => {
           console.log('comment  ' + comment.commentId + ':' + response.data)
           for (var re of response.data.list) {
@@ -506,225 +445,187 @@ export default {
         this.getReplies(comment.replyInfo.currentPage + 1, 2, i)
       }
     }
-
   }
 }
 </script>
 <style lang="stylus" scoped>
-.my-reply {
-  padding: 10px;
-  background-color: #fafbfc;
-  text-align: left;
-
-  .header-img {
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  .reply-info {
-    display: inline-block;
-    margin-left: 5px;
-    width: 90%;
-
-    @media screen and (max-width: 1200px) {
-      width: 80%;
+  .my-reply {
+    padding: 10px;
+    background-color: #fafbfc;
+    text-align: left;
+    .header-img {
+      display: inline-block;
+      vertical-align: top;
     }
-
+    .reply-info {
+      display: inline-block;
+      margin-left: 5px;
+      width: 90%;
+      @media screen and (max-width: 1200px) {
+        width: 80%;
+      }
+      .reply-input {
+        min-height: 20px;
+        line-height: 22px;
+        padding: 10px 10px;
+        color: #ccc;
+        background-color: #fff;
+        border-radius: 5px;
+        text-align: left;
+        &:empty:before {
+          content: attr(placeholder);
+        }
+        &:focus:before {
+          content: none;
+        }
+        &:focus {
+          padding: 8px 8px;
+          border: 2px solid blue;
+          box-shadow: none;
+          outline: none;
+        }
+      }
+    }
+    .reply-btn-box {
+      height: 25px;
+      margin: 10px 0;
+      .reply-btn {
+        position: relative;
+        float: right;
+        margin-right: 15px;
+      }
+    }
+  }
+  .my-comment-reply {
+    margin-left: 50px;
+    text-align: left;
     .reply-input {
-      min-height: 20px;
-      line-height: 22px;
-      padding: 10px 10px;
-      color: #ccc;
-      background-color: #fff;
-      border-radius: 5px;
-      text-align: left;
-
-      &:empty:before {
-        content: attr(placeholder);
-      }
-
-      &:focus:before {
-        content: none;
-      }
-
-      &:focus {
-        padding: 8px 8px;
-        border: 2px solid blue;
-        box-shadow: none;
-        outline: none;
-      }
+      width: flex;
     }
   }
-
-  .reply-btn-box {
-    height: 25px;
-    margin: 10px 0;
-
-    .reply-btn {
-      position: relative;
+  .author-title:not(:last-child) {
+    border-bottom: 1px solid rgba(178, 186, 194, 0.3);
+  }
+  .author-title {
+    padding: 10px;
+    width: 100%;
+    .header-img {
+      display: inline-block;
+      vertical-align: top;
+      float: left;
+    }
+    .author-info {
+      display: inline-block;
+      margin-left: 0px;
+      width: 60%;
+      height: 40px;
+      line-height: 20px;
+      > span {
+        display: block;
+        cursor: pointer;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .author-name {
+        color: #000;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: left;
+      }
+      .author-time {
+        font-size: 14px;
+        text-align: left;
+      }
+    }
+    .icon-btn {
+      width: 30%;
+      padding: 0 !important;
       float: right;
-      margin-right: 15px;
+      @media screen and (max-width: 1200px) {
+        width: 20%;
+        padding: 7px;
+      }
+      > span {
+        cursor: pointer;
+      }
+      .iconfont {
+        margin: 0 5px;
+      }
+    }
+    .talk-box {
+      margin: 0 50px;
+      text-align: left;
+      padding-left: 2%;
+      > p {
+        margin: 0;
+      }
+      .reply {
+        font-size: 16px;
+        color: #000;
+      }
+    }
+    .reply-box {
+      margin: 10px 0 0 50px;
+      background-color: #efefef;
     }
   }
-}
-
-.my-comment-reply {
-  margin-left: 50px;
-  text-align: left;
-
-  .reply-input {
-    width: flex;
+  .wrap {
+    width: 1000px;
+    margin: 0 auto;
+    height: auto;
   }
-}
-
-.author-title:not(:last-child) {
-  border-bottom: 1px solid rgba(178, 186, 194, 0.3);
-}
-
-.author-title {
-  padding: 10px;
-  width: 100%;
-
-  .header-img {
-    display: inline-block;
-    vertical-align: top;
+  .avatar {
+    width: 24px;
+    height: 24px;
     float: left;
   }
-
-  .author-info {
-    display: inline-block;
-    margin-left: 0px;
-    width: 60%;
-    height: 40px;
-    line-height: 20px;
-
-    > span {
-      display: block;
-      cursor: pointer;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .author-name {
-      color: #000;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: left;
-    }
-
-    .author-time {
-      font-size: 14px;
-      text-align: left;
-    }
+  .author {
+    padding-left: 10px;
+    color: #3293ee;
+    float: left;
   }
-
-  .icon-btn {
-    width: 30%;
-    padding: 0 !important;
-    float: right;
-
-    @media screen and (max-width: 1200px) {
-      width: 20%;
-      padding: 7px;
-    }
-
-    > span {
-      cursor: pointer;
-    }
-
-    .iconfont {
-      margin: 0 5px;
-    }
-  }
-
-  .talk-box {
-    margin: 0 50px;
+  .post-detail {
     text-align: left;
-    padding-left: 2%;
-
-    > p {
-      margin: 0;
-    }
-
-    .reply {
-      font-size: 16px;
-      color: #000;
-    }
   }
-
-  .reply-box {
-    margin: 10px 0 0 50px;
-    background-color: #efefef;
+  .post-content {
+    width: 100%;
+    padding: auto;
+    text-align: left;
   }
-}
-
-.wrap {
-  width: 1000px;
-  margin: 0 auto;
-  height: auto;
-}
-
-.avatar {
-  width: 24px;
-  height: 24px;
-  float: left;
-}
-
-.author {
-  padding-left: 10px;
-  color: #3293ee;
-  float: left;
-}
-
-.post-detail {
-  text-align: left;
-}
-
-.post-content {
-  width: 100%;
-  padding: auto;
-  text-align: left;
-}
-
-.post-description {
-  font-size: 16px;
-  padding: auto;
-  text-align: right;
-  color: gray;
-}
-
-.post-title {
-  width: 100%;
-  padding-top: 0px;
-  color: #1a1a1a;
-  text-align: left;
-  font-size: 24px;
-  line-height: 1.6;
-  font-weight: 600;
-  overflow: auto;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  float: left;
-}
-
-.usercard {
-  margin: 0 auto;
-  margin-top: 20px;
-}
-
-.like-button {
-  float: right;
-  padding: auto;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  size: mini;
-}
-
-.comment-num {
-  float: right;
-  padding: auto;
-  padding-right: 10px;
-  padding-top: 8px;
-}
+  .post-description {
+    font-size: 16px;
+    padding: auto;
+    text-align: right;
+    color: gray;
+  }
+  .post-title {
+    width: 100%;
+    padding-top: 0px;
+    color: #1a1a1a;
+    text-align: left;
+    font-size: 24px;
+    line-height: 1.6;
+    font-weight: 600;
+    overflow: auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    float: left;
+  }
+  .usercard {
+    margin: 0 auto;
+    margin-top: 20px;
+  }
+  .like-button {
+    float: right;
+    padding: auto;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  .comment-num {
+    float: right;
+    padding: auto;
+    padding-right: 10px;
+    padding-top: 8px;
+  }
 </style>
