@@ -181,7 +181,7 @@ export default {
     trainModel (val) {
       var that = this
       that.loading = true
-      that.$axios.get('/train/train/train/' + that.username + '/' + val.pipelineId + '/' + val.pipelineName + '/test' + '?description=' + val.description).then(response => {
+      that.$axios.get('/train/train/train/' + that.username + '/' + val.pipelineId + '/' + val.pipelineName + '/'+'53' + '?description=' + val.description).then(response => {
         this.$message({
           message: 'begin training ' + val.modelname,
           type: 'success'
@@ -202,9 +202,6 @@ export default {
             }
           })
         })
-    },
-    downloadModel (val) {
-      this.$axios.get('/boot/model/download/' + this.username + '/pipeline/' + val.pipelineName + '.zip')
     },
     deleteModel (val) {
       var that = this

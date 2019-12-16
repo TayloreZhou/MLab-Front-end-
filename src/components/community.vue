@@ -40,13 +40,13 @@
         <el-card>
           <div slot="header">
             <el-avatar :size="150"
-                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                       :src="userInfo.avatar"></el-avatar>
           </div>
           <div>
-            <a>username</a></div>
+            <a>{{userInfo.username}}</a></div>
           <div>
-            <a>email</a></div>
-          <div><a>like_num</a></div>
+            <a>{{userInfo.email}}</a></div>
+          <div><a>{{userInfo.likeNum}} like</a></div>
         </el-card>
       </el-aside>
     </el-container>
@@ -71,12 +71,28 @@ export default {
       pages: 1,
       currentPage: 1,
       pageshow: true,
-      searchInput: '\0'
+      searchInput: '\0',
+      userInfo: {
+        username: '',
+        avatar: '',
+        email: '',
+        likeNum: 0
+      }
     }
   },
   created: function () {
     // 默认获取最热信息
     this.searchInput = this.$route.query.searchInput
+    this.userInfo.username = localStorage.getItem('username')
+    this.$axios({
+      method: 'get',
+      url: '/server/community-service/user/'+localStorage.getItem('username'),
+    }).then((response) => {
+      console.log(response.data)
+      this.userInfo.email = response.data.email
+      this.userInfo.likeNum = response.data.likeNum
+      this.userInfo.avatar = response.data.avatarUrl
+    })
     console.log(this.$route.query.searchInput)
     this.getList(1)
   },
@@ -107,7 +123,7 @@ export default {
       // 获取热门主题下的信息
       console.log(this.searchInput + ' search')
       this.$axios
-        .post('/boot/post/search-order-by-like?page-num=' + pageNum + '&&page-size=' + this.pageSize, {
+        .post('/server/community-service/post/search-order-by-like?page-num=' + pageNum + '&&page-size=' + this.pageSize, {
           searchInput: typeof this.searchInput === 'undefined' ? '' : this.searchInput
         })
         .then(response => {
@@ -125,7 +141,7 @@ export default {
     getLatestList (pageNum) {
       // 获取最新主题下的信息
       this.$axios
-        .post('/boot/post/search-order-by-time?page-num=' + pageNum + '&&page-size=' + this.pageSize, {
+        .post('/server/community-service/post/search-order-by-time?page-num=' + pageNum + '&&page-size=' + this.pageSize, {
           searchInput: typeof this.searchInput === 'undefined' ? '' : this.searchInput
         })
         .then(response => {

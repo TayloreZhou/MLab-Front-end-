@@ -16,7 +16,7 @@
             <div class="post-detail">
               <a class="post-title">{{postData.title}}</a>
               <a class="post-description">{{$moment(postData.createTime).format('YYYY-MM-DD HH:mm')}}</a>
-              <p class="post-content">{{postData.content}}</p>
+              <markdown-it-vue class="md-body" :content="postData.content" :options="options" />
             </div>
             <div>
               <i class="icon-btn el-icon-s-comment"
@@ -158,6 +158,8 @@
   </div>
 </template>
 <script>
+import MarkdownItVue from 'markdown-it-vue'
+import 'markdown-it-vue/dist/markdown-it-vue.css'
 const clickoutside = {
   // 初始化指令
   bind (el, binding, vnode) {
@@ -185,6 +187,9 @@ const clickoutside = {
 }
 export default {
   name: 'postDetail',
+  components: {
+    MarkdownItVue
+  },
   data () {
     return {
       btnShow: false,
@@ -221,14 +226,35 @@ export default {
         avatar: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576236443792&di=a59189a577729463ee4c42ccada26eb0&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201802%2F27%2F20180227201208_ujwhc.jpeg'
 
       },
-      commentFold: true
+      commentFold: true,
+      options: {
+        markdownIt: {
+          linkify: true
+        },
+        linkAttributes: {
+          attrs: {
+            target: '_blank',
+            rel: 'noopener'
+          }
+        }
+      }
     }
   },
   directives: { clickoutside },
   created: function () {
     this.postId = this.$route.query.postId
+    this.userInfo.username = localStorage.getItem('username')
+    this.$axios({
+      method: 'get',
+      url: '/server/community-service/user/'+localStorage.getItem('username'),
+    }).then((response) => {
+      console.log(response.data)
+      this.userInfo.email = response.data.email
+      this.userInfo.likeNum = response.data.likeNum
+      this.userInfo.avatar = response.data.avatarUrl
+    })
     this.$axios
-      .get('/boot/post/' + this.postId)
+      .get('/server/community-service/post/' + this.postId)
       .then(response => {
         this.postData = response.data
         this.postLikeNum = response.data.likeNum
@@ -237,6 +263,15 @@ export default {
         this.authorInfo.avatar = response.data.avatarUrl
         this.checkPostLike()
         this.getComments(1, this.commentInfo.pageSize)
+        this.$axios({
+          method: 'get',
+          url: '/server/community-service/user/'+this.postData.username,
+        }).then((response) => {
+          console.log(response.data)
+          this.authorInfo.email = response.data.email
+          this.authorInfo.likeNum = response.data.likeNum
+          this.authorInfo.avatar = response.data.avatarUrl
+        })
       })
       .catch(error => {
         console.log(error)
@@ -285,7 +320,7 @@ export default {
         newComment.likeNum = 0
         newComment.content = this.commentInput
         newComment.inputShow = false
-        this.$axios.post('/boot/comment/publish', {
+        this.$axios.post('/server/community-service/comment/publish', {
           postId: this.postData.postId,
           username: this.userInfo.username,
           content: this.commentInput
@@ -317,7 +352,7 @@ export default {
         newReply.avatarUrl = this.userInfo.avatar
         newReply.createTime = 'just a minute'
         newReply.content = this.replyInput
-        this.$axios.post('/boot/reply/publish', {
+        this.$axios.post('/server/community-service/reply/publish', {
           username: this.userInfo.username,
           commentId: this.comments[i].commentId,
           content: this.replyInput
@@ -368,7 +403,7 @@ export default {
     },
     checkPostLike () {
       this.$axios
-        .get('/boot/like/check?user=' + this.author + '&&type=0&&type-id=' + this.postId)
+        .get('/server/community-service/like/check?user=' + this.author + '&&type=0&&type-id=' + this.postId)
         .then(response => {
           if (response.data === true) {
             this.likeType = 'primary'
@@ -379,7 +414,7 @@ export default {
     },
     checkCommentLike (i) {
       this.$axios
-        .get('/boot/like/check?user=' + this.userInfo.username + '&&type=1&&type-id=' + this.comments[i].commentId)
+        .get('/server/community-service/like/check?user=' + this.userInfo.username + '&&type=1&&type-id=' + this.comments[i].commentId)
         .then(response => {
           this.comments[i].likeStatus = response.data
           document.getElementsByName('like')[i].style.color = response.data ? '#3293ee' : ''
@@ -387,7 +422,7 @@ export default {
     },
     handlePostLike () {
       if (this.likeType === '') {
-        this.$axios.post('/boot/like/post', {
+        this.$axios.post('/server/community-service/like/post', {
           username: this.author,
           typeId: this.postId,
           likedUsername: this.author
@@ -397,7 +432,7 @@ export default {
           console.log(error)
         })
       } else if (this.likeType === 'primary') {
-        this.$axios.post('/boot/unlike/post', {
+        this.$axios.post('/server/community-service/unlike/post', {
           username: this.author,
           type: 0,
           typeId: this.postId,
@@ -409,7 +444,7 @@ export default {
         })
       }
       this.$axios
-        .get('/boot/post/' + this.postId)
+        .get('/server/community-service/post/' + this.postId)
         .then(response => {
           console.log('post data\n')
           console.log(response.data)
@@ -422,7 +457,7 @@ export default {
     },
     handleLikeComment (i) {
       if (this.comments[i].likeStatus === false) {
-        this.$axios.post('/boot/like/comment', {
+        this.$axios.post('/server/community-service/like/comment', {
           username: this.userInfo.username,
           typeId: this.comments[i].commentId
         }).then(response => {
@@ -435,7 +470,7 @@ export default {
           console.log(error)
         })
       } else if (this.comments[i].likeStatus === true) {
-        this.$axios.post('/boot/unlike/comment', {
+        this.$axios.post('/server/community-service/unlike/comment', {
           username: this.userInfo.username,
           typeId: this.comments[i].commentId
         }).then(response => {
@@ -458,7 +493,7 @@ export default {
     getComments (pageNum, pageSize) {
       // 请求评论
       this.$axios
-        .get('/boot/comment/get-comments-of-post/' + this.postData.postId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
+        .get('/server/community-service/comment/get-comments-of-post/' + this.postData.postId + '?page-num=' + pageNum + '&&page-size=' + pageSize)
         .then(response => {
           console.log(response.data)
           // result为comment构成的列表
@@ -482,7 +517,7 @@ export default {
     getReplies (pageNum, pageSize, i) {
       var comment = this.comments[i]
       this.$axios
-        .get('/boot/reply/get-replies-of-comment/' + comment.commentId + '?page-num=' + pageNum + '&&page-size=' + 2)
+        .get('/server/community-service/reply/get-replies-of-comment/' + comment.commentId + '?page-num=' + pageNum + '&&page-size=' + 2)
         .then(response => {
           console.log('comment  ' + comment.commentId + ':' + response.data)
           for (var re of response.data.list) {

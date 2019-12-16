@@ -33,13 +33,13 @@
         <el-card>
           <div slot="header">
             <el-avatar :size="150"
-                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                       :src="userInfo.avatar"></el-avatar>
           </div>
           <div>
-            <a>username</a></div>
+            <a>{{userInfo.username}}</a></div>
           <div>
-            <a>email</a></div>
-          <div><a>like_num</a></div>
+            <a>{{userInfo.email}}</a></div>
+          <div><a>{{userInfo.likeNum}} like</a></div>
         </el-card>
       </el-aside>
     </el-container>
@@ -65,11 +65,29 @@ export default {
       pageSize: 10,
       pages: 0,
       currentPage: 1,
-      pageshow: true
+      pageshow: true,
+      userInfo: {
+        username: '',
+        avatar: '',
+        email: '',
+        likeNum: 0
+      }
     }
   },
   created: function () {
     // 默认获取最热信息
+
+    this.searchInput = this.$route.query.searchInput
+    this.userInfo.username = localStorage.getItem('username')
+    this.$axios({
+      method: 'get',
+      url: '/server/community-service/user/'+localStorage.getItem('username'),
+    }).then((response) => {
+      console.log(response.data)
+      this.userInfo.email = response.data.email
+      this.userInfo.likeNum = response.data.likeNum
+      this.userInfo.avatar = response.data.avatarUrl
+    })
     this.getList(1)
     this.getLatestList(this.currentPage)
   },

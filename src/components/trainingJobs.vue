@@ -80,7 +80,7 @@ export default {
       checked1: true,
       checked2: true,
       checked3: true,
-      username: 'cyy',
+      username: localStorage.getItem('username'),
       socket: null
     }
   },

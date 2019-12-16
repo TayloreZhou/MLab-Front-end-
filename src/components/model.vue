@@ -45,7 +45,7 @@
               </div>
               <div>
                 <el-divider></el-divider>
-                <el-link :href="'http://localhost:8085/model/download/'+username+'/model/'+x.modelName+'.zip'"
+                <el-link :href="'http://localhost:8086/model/download/'+username+'/model/'+x.modelId+'.zip'"
                          target="_blank"
                          :underline="false"
                          style="padding: 5px">
@@ -94,7 +94,7 @@
               </div>
               <div>
                 <el-divider></el-divider>
-                <el-link :href="'http://localhost:8085/model/download/'+username+'/model/'+x.modelName+'.zip'"
+                <el-link :href="'http://localhost:8086/model/download/'+username+'/model/'+x.modelId+'.zip'"
                          target="_blank"
                          :underline="false"
                          style="padding: 5px">
@@ -140,7 +140,7 @@
             class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary"
-                   @click="dialogVisible = false">确 定</el-button>
+                   @click="predict">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -152,7 +152,7 @@ export default {
   data () {
     return {
       tableData: [],
-      fileList: ['ac.txt', 'uc.csv', 'enc.txt'],
+      fileList: [],
       currentPage: 1,
       dialogVisible: false,
       totalSize: 0,
@@ -160,7 +160,7 @@ export default {
       searchItem: '',
       searchList: [],
       selectVal: '',
-      username: 'cyy',
+      username: localStorage.getItem('username'),
       loading: false
     }
   },
@@ -176,7 +176,7 @@ export default {
   mounted () {
     var that = this
     that.loading = true
-    that.$axios.get('/meta/model/cyy').then(response => {
+    that.$axios.get('/meta/model/'+that.username).then(response => {
       that.$forceUpdate()
       console.log(response.data)
       var receiveTable = response.data
@@ -191,7 +191,21 @@ export default {
       }
       that.totalSize = that.tableData.length
       that.loading = false
-    })
+    }),
+    this.$axios.get('/server/metadata-service/datasetnp/'+localStorage.getItem('username'))
+        .then((response) => {
+          console.log('1', this.files)
+          console.log('1', response.data)
+          this.fileList = []
+          for (var i = 0; i < response.data.length; i++) {
+            this.fileList.push(response.data[i].datasetName+'.'+response.data[i].format)
+          }
+          this.init()
+          console.log('2', this.files)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
   },
   methods: {
     predictModel () {
@@ -252,6 +266,9 @@ export default {
         this.totalSize = this.searchList.length
         this.modelList = this.searchList.slice(this.currentPage * 6 - 6, this.currentPage * 6)
       }
+    },
+    predict(){
+      this.$axios.get('/train/predict/'+'test'+'/11'+'/11'+'/53')
     },
     refresh () {
       var that = this

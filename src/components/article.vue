@@ -53,7 +53,17 @@ export default {
       })
     },
     onSubmit () {
-      console.log('submit')
+      axios({
+        method: 'post',
+        url: '/server/community-service/post/publish',
+        data: {
+          username: localStorage.getItem('username'),
+          title: this.value.split('\n')[0],
+          content: this.value,
+        }
+      }).then((response) => {
+        this.$router.push('/society')
+      })
     }
   }
 }
