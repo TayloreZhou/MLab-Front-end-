@@ -41,7 +41,7 @@
                            size="mini"
                            type="success"
                            round
-                           @click="confirm(scope.row)">download</el-button>
+                           @click="download(x)"></el-button>
               </el-link>
             </template>
           </el-table-column>
@@ -248,6 +248,9 @@ export default {
         that.tableData.splice(that.tableData.indexOf(val), 1)
         that.viewTable.splice(that.viewTable.indexOf(val), 1)
       })
+    },
+    download (x) {
+
     }
   }
 }

@@ -84,7 +84,7 @@
                            @click="predictModel(x)">Predict</el-button>
               </div>
               <div class="text item">
-                create time：{{x.createTimr}}
+                create time：{{x.createTime}}
               </div>
               <div class="text item">
                 creator：{{x.username}}
@@ -176,7 +176,7 @@ export default {
   mounted () {
     var that = this
     that.loading = true
-    that.$axios.get('/meta/model/'+that.username).then(response => {
+    that.$axios.get('/meta/model/' + that.username).then(response => {
       that.$forceUpdate()
       console.log(response.data)
       var receiveTable = response.data
@@ -190,15 +190,13 @@ export default {
         that.modelList.push(that.tableData[i])
       }
       that.totalSize = that.tableData.length
-      that.loading = false
-    }),
-    this.$axios.get('/server/metadata-service/datasetnp/'+localStorage.getItem('username'))
+      that.$axios.get('/server/metadata-service/datasetnp/' + localStorage.getItem('username'))
         .then((response) => {
           console.log('1', this.files)
           console.log('1', response.data)
           this.fileList = []
           for (var i = 0; i < response.data.length; i++) {
-            this.fileList.push(response.data[i].datasetName+'.'+response.data[i].format)
+            this.fileList.push(response.data[i].datasetName + '.' + response.data[i].format)
           }
           this.init()
           console.log('2', this.files)
@@ -206,6 +204,8 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+      that.loading = false
+    })
   },
   methods: {
     predictModel () {
@@ -267,13 +267,20 @@ export default {
         this.modelList = this.searchList.slice(this.currentPage * 6 - 6, this.currentPage * 6)
       }
     },
-    predict(){
-      this.$axios.get('/train/predict/'+'test'+'/11'+'/11'+'/53')
+    predict (val) {
+      var that = this
+      this.$axios.get('/train/predict/' + that.username + '/' + val.pipelineId + '/' + val.pipelineName + '/' + val.fileId).then(response => {
+        this.$message({
+          message: 'begin training ' + val.modelname,
+          type: 'success'
+        })
+        that.loading = false
+      })
     },
     refresh () {
       var that = this
       that.loading = true
-      that.$axios.get('/meta/model/cyy').then(response => {
+      that.$axios.get('/meta/model/' + this.getItem('username')).then(response => {
         that.$forceUpdate()
         that.modelList = []
         console.log(response.data)

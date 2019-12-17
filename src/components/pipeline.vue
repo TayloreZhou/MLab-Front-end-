@@ -144,7 +144,7 @@ export default {
       modelList: [],
       searchItem: '',
       searchList: [],
-      username: localStorage.getItem("username"),
+      username: localStorage.getItem('username'),
       loading: false
     }
   },
@@ -160,7 +160,7 @@ export default {
   mounted () {
     var that = this
     that.loading = true
-    that.$axios.get('/server/metadata-service/pipeline/'+localStorage.getItem('username')).then(response => {
+    that.$axios.get('/server/metadata-service/pipeline/' + localStorage.getItem('username')).then(response => {
       that.$forceUpdate()
       console.log(response.data)
       var receiveTable = response.data
@@ -181,7 +181,7 @@ export default {
     trainModel (val) {
       var that = this
       that.loading = true
-      that.$axios.get('/train/train/train/' + that.username + '/' + val.pipelineId + '/' + val.pipelineName + '/'+'53' + '?description=' + val.description).then(response => {
+      that.$axios.get('/train/train/train/' + that.username + '/' + val.pipelineId + '/' + val.pipelineName + '/' + '53' + '?description=' + val.description).then(response => {
         this.$message({
           message: 'begin training ' + val.modelname,
           type: 'success'
